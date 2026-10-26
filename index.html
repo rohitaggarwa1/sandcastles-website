@@ -151,7 +151,9 @@ section{padding-block:84px}
 .about h2{font-size:clamp(1.9rem,3.6vw,2.6rem);margin:12px 0 18px}
 .about p{color:var(--muted);max-width:36em}
 .founders{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.founder{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px}
+.founder{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 12px 20px;display:flex;flex-direction:column}
+.founder .ph{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:10px;display:block;margin-bottom:16px}
+.founder > :not(.ph){padding-inline:8px}
 .founder .ini{width:46px;height:46px;border-radius:50%;background:var(--navy);color:#e6cf9d;display:grid;place-items:center;font:600 1.1rem/1 var(--f-display);margin-bottom:14px}
 .founder b{font-family:var(--f-display);font-size:1.2rem;display:block}
 .founder span{font-size:.85rem;color:var(--muted)}
@@ -237,8 +239,8 @@ footer .brand b{font-size:.9rem}
     <div class="wrap">
       <div class="stat"><b>32</b><span>Stays on Airbnb</span></div>
       <div class="stat"><b>4</b><span>Cities so far</span></div>
-      <div class="stat"><b>4.68★</b><span>Host rating</span></div>
-      <div class="stat"><b>470+</b><span>Guest reviews</span></div>
+      <div class="stat"><b>4.66★</b><span>Average host rating</span></div>
+      <div class="stat"><b>936</b><span>Guest reviews</span></div>
       <div class="stat"><b>5</b><span>Years hosting</span></div>
     </div>
   </div>
@@ -303,13 +305,13 @@ footer .brand b{font-size:.9rem}
     </div>
     <div class="founders">
       <div class="founder">
-        <div class="ini">R</div>
+        <img class="ph" src="img/rohit.jpg" alt="Rohit, co-founder of Sandcastles" loading="lazy" width="640" height="800">
         <b>Rohit</b><span>Co-founder · Operations</span>
         <p>Engineer from VIT Vellore. Runs pricing, guests and the owner side of the business.</p>
         <a href="https://www.airbnb.co.in/users/show/153546484" target="_blank" rel="noopener">Airbnb profile →</a>
       </div>
       <div class="founder">
-        <div class="ini">D</div>
+        <img class="ph" src="img/deepika.jpg" alt="Deepika, co-founder of Sandcastles" loading="lazy" width="640" height="800">
         <b>Deepika</b><span>Co-founder · Interiors</span>
         <p>Interior designer who styles each home before it goes live.</p>
         <a href="https://www.airbnb.co.in/users/show/183360061" target="_blank" rel="noopener">Airbnb profile →</a>
