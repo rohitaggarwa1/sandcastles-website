@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta property="og:title" content="Sandcastles for Owners">
-<meta property="og:description" content="We run your home as a professionally managed Airbnb, with transparent revenue sharing and full owner visibility.">
+<meta property="og:title" content="Airbnb management for homeowners · Sandcastles">
+<meta property="og:description" content="Find out what your home could earn on Airbnb. 70% of the profit to you, paid monthly, with every rupee on record.">
 <meta property="og:image" content="/img/hero-1.jpg">
 <title>Sandcastles for Owners</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="Sandcastles Airbnb management for homeowners across India: end-to-end operations, transparent revenue sharing, full owner visibility and clear exit terms.">
+<meta name="description" content="Find out what your home in Goa, Bengaluru or anywhere in India could earn on Airbnb. 70% of the profit to you, paid monthly, with every rupee on record.">
 <link rel="canonical" href="https://sandcastlesstays.com/owners/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,6 +60,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .nav{display:flex;gap:26px;align-items:center}
 .nav a{color:var(--on-navy-muted);text-decoration:none;font-size:.92rem;font-weight:500}
 .nav a:hover{color:var(--on-navy)}
+.nav a.nav-own{color:#e6cf9d;font-weight:700}
 .nav .btn{padding:.7em 1.1em;font-size:.85rem}
 .nav a.btn-gold,.nav a.btn-gold:hover{color:#14213a}
 @media (max-width:820px){
@@ -282,6 +283,127 @@ footer .soc a{color:#e6cf9d;text-decoration:none}footer .brand b{font-size:.9rem
   .mate b{align-self:end}.mate span{align-self:start}
 }
 </style>
+<style>
+.ow-hero .wrap.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center;padding-block:44px 40px}
+.ow-hero .hero-copy h1{font-size:clamp(2.3rem,4.6vw,3.7rem)}
+.ow-hero .hero-copy p{margin-bottom:22px}
+.ow-hero .hero-copy h1{max-width:11em}
+.ticks{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.ticks li{position:relative;padding-left:30px;color:#e6e8ee;font-size:1rem}
+.ticks li::before{content:"";position:absolute;left:0;top:3px;width:18px;height:18px;border-radius:50%;background:var(--gold)}
+.ticks li::after{content:"";position:absolute;left:5px;top:8px;width:7px;height:4px;border-left:2px solid #14213a;border-bottom:2px solid #14213a;transform:rotate(-45deg)}
+.est{background:#fffdf8;color:#1a2236;border-radius:18px;padding:28px;box-shadow:0 24px 60px -30px rgba(0,0,0,.6);color-scheme:light}
+.est h2{font-size:1.6rem;margin:0 0 6px;color:#1a2236}
+.ow-hero .est p.est-sub{margin:0 0 16px;color:#5f6779;font-size:.95rem;max-width:none}
+.est fieldset{border:0;margin:0 0 12px;padding:0;min-width:0}
+.est legend{font-weight:600;font-size:.88rem;margin-bottom:8px;padding:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chipr{position:relative}
+.chipr input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.chipr span{display:inline-block;padding:.6em 1em;border:1px solid #e5dccb;border-radius:10px;font-size:.92rem;background:#fff;color:#1a2236}
+.chipr input:checked+span{border-color:#c49a4a;background:#f6ecd8;font-weight:700}
+.chipr input:focus-visible+span{outline:2px solid #c49a4a;outline-offset:2px}
+.est .txt{display:block;font-weight:600;font-size:.88rem;margin:4px 0 8px}
+.est .txt span{font-weight:400;color:#5f6779}
+.est input[type=text]{width:100%;padding:.8em .9em;border:1px solid #e5dccb;border-radius:10px;font:inherit;background:#fff;color:#1a2236}
+.est input[type=text]:focus-visible{outline:2px solid #c49a4a;outline-offset:1px}
+.est-go{width:100%;justify-content:center;margin-top:16px;font-size:1rem}
+.ow-hero .est p.est-fine{margin:12px 0 0;text-align:center;font-size:.84rem;color:#5f6779;max-width:none}
+@media (max-width:900px){.ow-hero .eyebrow{letter-spacing:.16em;line-height:1.6}.ow-hero .wrap.hero-grid{grid-template-columns:1fr;gap:28px;padding-block:44px 32px}.est{padding:22px}}
+.trust{background:var(--navy);border-top:1px solid rgba(196,154,74,.3)}
+.trust .wrap{display:grid;grid-template-columns:repeat(3,1fr);padding-block:22px;gap:16px}
+.trust div div,.trust .wrap>div{color:var(--on-navy)}
+.trust b{display:block;font:600 1.8rem/1 var(--f-display);color:var(--gold-soft);font-variant-numeric:tabular-nums}
+.trust span{font-size:.85rem;color:var(--on-navy-muted)}
+@media (max-width:560px){.trust .wrap{grid-template-columns:1fr 1fr}.trust .wrap>div:last-child{grid-column:span 2}}
+.vs-wrap{overflow-x:auto;margin-bottom:44px;border:1px solid var(--line);border-radius:var(--r);background:var(--card)}
+.vs{width:100%;border-collapse:collapse;min-width:440px}
+.vs th,.vs td{padding:14px 18px;text-align:left;border-bottom:1px solid var(--line);font-size:.95rem}
+.vs tr:last-child th,.vs tr:last-child td{border-bottom:0}
+.vs thead th{font:400 .72rem/1 var(--f-caps);letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.vs thead th.us{color:var(--gold)}
+.vs tbody th{font-weight:600}
+.vs td.us{font-weight:700;color:var(--fg);background:rgba(196,154,74,.08)}
+.vs td{color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.sub-h{font-size:1.4rem;margin:0 0 18px}
+.pcards{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.pcards li{display:flex;gap:14px;align-items:flex-start;padding:20px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(196,154,74,.22)}
+.pcards .ic{background:rgba(214,174,98,.16)}
+.pcards .ic svg{stroke:#e6cf9d}
+.pcards h3{font:700 1.04rem/1.3 var(--f-body);color:#f3ead8;margin-bottom:4px}
+.pcards p{margin:0;color:var(--on-navy-muted);font-size:.93rem;line-height:1.5}
+@media (max-width:900px){.pcards{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.pcards{grid-template-columns:1fr}}
+.tl{list-style:none;padding:0;margin:8px 0 36px;display:grid;grid-template-columns:repeat(5,1fr);gap:18px;position:relative}
+.tl::before{content:"";position:absolute;left:20px;right:20px;top:20px;height:1px;background:var(--line)}
+.tl li{position:relative}
+.tl .n{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--navy);color:#e6cf9d;border:1px solid rgba(196,154,74,.6);font:600 1rem/1 var(--f-display);margin-bottom:14px;position:relative}
+.tl b{display:block;font-size:1.02rem;margin-bottom:4px}
+.tl p{margin:0;color:var(--muted);font-size:.92rem}
+@media (max-width:860px){.tl{grid-template-columns:1fr;gap:0}.tl::before{left:19px;right:auto;top:20px;bottom:20px;width:1px;height:auto}.tl li{display:grid;grid-template-columns:40px 1fr;gap:16px;padding-bottom:20px}.tl .n{margin:0}}
+.start2{display:grid;grid-template-columns:1fr 1.2fr;gap:16px}
+.box{padding:24px;border-radius:var(--r);border:1px solid var(--line);background:var(--bg)}
+.box h3{font-size:1.3rem;margin-bottom:10px}
+.box p{margin:0;color:var(--muted)}
+.box p b{color:var(--fg)}
+.box.gold{border-color:rgba(196,154,74,.5);background:rgba(196,154,74,.1)}
+.mini-terms{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.mini-terms strong{display:block;font:600 1.5rem/1 var(--f-display);color:var(--gold);margin-bottom:6px}
+.mini-terms span{font-size:.88rem;color:var(--muted)}
+@media (max-width:860px){.start2{grid-template-columns:1fr}}
+@media (max-width:480px){.mini-terms{grid-template-columns:1fr}}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;margin-top:24px}
+.stmt{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--card);box-shadow:0 20px 50px -34px rgba(20,33,58,.5)}
+.stmt-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:18px 22px;background:var(--navy);color:#f3ead8}
+.stmt-h b{font:600 1.2rem/1.2 var(--f-display)}
+.stmt-h span{font-size:.8rem;color:#e6cf9d}
+.stmt ul{list-style:none;margin:0;padding:6px 22px}
+.stmt li{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.stmt li.m span,.stmt li.m b{color:var(--muted);font-weight:500}
+.stmt li.net{font-weight:700}
+.stmt li.you{border-bottom:0;margin:6px -22px 0;padding:14px 22px;background:rgba(196,154,74,.14);color:var(--fg);font-weight:700;font-size:1.05rem}
+.stmt li.you b{color:var(--gold)}
+.stmt-f{margin:0;padding:12px 22px;font-size:.8rem;color:var(--muted);border-top:1px solid var(--line)}
+.tgrid .lead{margin-bottom:20px}
+.tlist,.ucards{list-style:none;padding:0;margin:0;display:grid;gap:16px}
+.tlist li,.ucards li{display:flex;gap:14px;align-items:flex-start}
+.tlist h3,.ucards h3{font:700 1.02rem/1.3 var(--f-body);margin-bottom:3px}
+.tlist p,.ucards p{margin:0;color:var(--muted);font-size:.93rem}
+@media (max-width:860px){.tgrid{grid-template-columns:1fr;gap:28px}}
+.use{display:grid;grid-template-columns:.95fr 1.05fr;gap:44px;align-items:center}
+.use img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:var(--r);display:block}
+.use h2{margin-top:12px}
+.ucards{margin-top:4px}
+@media (max-width:860px){.use{grid-template-columns:1fr;gap:24px}}
+.faq{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px;align-items:start}
+.faq details{border:1px solid var(--line);border-radius:12px;background:var(--card);padding:0 20px}
+.faq summary{cursor:pointer;list-style:none;padding:18px 28px 18px 0;font-weight:700;position:relative}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";position:absolute;right:0;top:14px;font:400 1.5rem/1 var(--f-body);color:var(--gold)}
+.faq details[open] summary::after{content:"−"}
+.faq summary:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:4px}
+.faq details p{margin:0 0 18px;color:var(--muted)}
+@media (max-width:760px){.faq{grid-template-columns:1fr}}
+.close{display:grid;grid-template-columns:1.15fr .85fr;gap:44px;align-items:end}
+.close .team{max-width:560px}
+.close .mate{background:rgba(255,255,255,.04);border-color:rgba(196,154,74,.22)}
+.close .mate b{color:#f3ead8}.close .mate span{color:var(--on-navy-muted)}
+.crow{list-style:none;padding:0;margin:0;display:grid;gap:12px}
+.crow a,.crow .nolink{display:flex;gap:14px;align-items:center;padding:16px 18px;border-radius:12px;border:1px solid rgba(196,154,74,.3);background:rgba(255,255,255,.04);color:#f3ead8;text-decoration:none;min-width:0}
+.crow a:hover{background:rgba(214,174,98,.1)}
+.crow li:first-child a{background:var(--gold);border-color:var(--gold);color:#14213a}
+.crow li:first-child a .ic{background:rgba(20,33,58,.12)}
+.crow li:first-child a .ic svg{stroke:#14213a}
+.crow li:first-child small{color:#3a3020}
+.crow .ic{background:rgba(214,174,98,.16)}
+.crow .ic svg{stroke:#e6cf9d}
+.crow small{display:block;font:400 .68rem/1 var(--f-caps);letter-spacing:.2em;text-transform:uppercase;color:#e6cf9d;margin-bottom:6px}
+.crow b{font-weight:700;word-break:break-word}
+.crow span{min-width:0}
+.sel{user-select:all}
+@media (max-width:860px){.close{grid-template-columns:1fr;gap:32px}}
+</style>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="castle" viewBox="0 0 64 64">
     <path d="M30.5 6v10" stroke="currentColor" stroke-width="1.6" fill="none"/>
@@ -304,7 +426,7 @@ footer .soc a{color:#e6cf9d;text-decoration:none}footer .brand b{font-size:.9rem
     </a>
     <nav class="nav" aria-label="Main">
       <a href="/#stays">Stays</a>
-      <a href="/owners/" aria-current="page" style="color:#f3ead8">For owners</a>
+      <a class="nav-own" href="/owners/" aria-current="page">List your home</a>
       <a href="/#about">About</a>
       <a href="/shop/">Shop</a>
       <a href="/#contact">Contact</a>
@@ -315,14 +437,35 @@ footer .soc a{color:#e6cf9d;text-decoration:none}footer .brand b{font-size:.9rem
 <main>
 <div class="ow-hero">
   <img class="bg" src="/img/hero-2.jpg" srcset="/img/hero-2-m.jpg 900w, /img/hero-2.jpg 1800w" sizes="100vw" alt="" style="object-position:60% 50%">
-  <div class="wrap">
-    <div class="eyebrow">Sandcastles Airbnb Management</div>
-    <h1>Your home, run as a <em>professional Airbnb.</em></h1>
-    <p>End-to-end short-term rental operations for homeowners anywhere in India. You keep full visibility and a ready vacation home for family and friends, and we handle everything else.</p>
-    <div class="ctas">
-      <a class="btn btn-gold" href="https://wa.me/918072770364?text=Hi%20Sandcastles%2C%20I%27d%20like%20to%20talk%20about%20listing%20my%20home." target="_blank" rel="noopener">Talk to us on WhatsApp</a>
-      <a class="btn btn-ghost" href="#earnings">See what you'd earn</a>
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <div class="eyebrow">Airbnb management · Goa, Bengaluru &amp; anywhere in India</div>
+      <h1>Your empty home could earn <em>every month.</em></h1>
+      <p>We style it, list it, host every guest and look after it like our own. You get 70% of the profit every month, and the keys whenever you want to stay.</p>
+      <ul class="ticks">
+        <li>Every rupee in a shared sheet, every bill in a shared Drive</li>
+        <li>No upfront management fee</li>
+        <li>Damage covered by Airbnb AirCover, plus deposits on longer stays</li>
+      </ul>
     </div>
+    <form class="est" id="estimate" aria-labelledby="est-t">
+      <h2 id="est-t">What would your home earn?</h2>
+      <p class="est-sub">Free estimate based on our own homes nearby.</p>
+      <fieldset><legend>City</legend><div class="chips"><label class="chipr"><input type="radio" name="city" value="Goa" checked><span>Goa</span></label><label class="chipr"><input type="radio" name="city" value="Bengaluru"><span>Bengaluru</span></label><label class="chipr"><input type="radio" name="city" value="Other city"><span>Other city</span></label></div></fieldset>
+      <fieldset><legend>Size</legend><div class="chips"><label class="chipr"><input type="radio" name="size" value="Studio"><span>Studio</span></label><label class="chipr"><input type="radio" name="size" value="1 BHK"><span>1 BHK</span></label><label class="chipr"><input type="radio" name="size" value="2 BHK" checked><span>2 BHK</span></label><label class="chipr"><input type="radio" name="size" value="3 BHK+"><span>3 BHK+</span></label></div></fieldset>
+      <fieldset><legend>Furnishing today</legend><div class="chips"><label class="chipr"><input type="radio" name="furnishing" value="Fully" checked><span>Fully</span></label><label class="chipr"><input type="radio" name="furnishing" value="Partly"><span>Partly</span></label><label class="chipr"><input type="radio" name="furnishing" value="Empty"><span>Empty</span></label></div></fieldset>
+      <label class="txt" for="area">Area or society <span>(optional)</span></label>
+      <input id="area" name="area" type="text" placeholder="e.g. Rio De Goa, Dabolim" autocomplete="off">
+      <button type="submit" class="btn btn-gold est-go">Get my estimate on WhatsApp →</button>
+      <p class="est-fine">Rohit replies personally within 24 hours. No obligation.</p>
+    </form>
+  </div>
+</div>
+<div class="trust">
+  <div class="wrap">
+    <div><b>32</b><span>homes we run today</span></div>
+    <div><b>5 years</b><span>hosting on Airbnb</span></div>
+    <div><b>4.66★</b><span>across 936 guest reviews</span></div>
   </div>
 </div>
 
@@ -342,50 +485,21 @@ footer .soc a{color:#e6cf9d;text-decoration:none}footer .brand b{font-size:.9rem
   </div>
 </section>
 
-<section class="ow dark">
-  <div class="wrap">
-    <div class="eyebrow">Our solution</div>
-    <h2>We manage your home <em>as its operator</em></h2>
-    <p class="lead">We run your home as a professionally managed Airbnb, with three promises.</p>
-    <div class="pillars">
-      <div><b>Revenue</b><h3>Transparent sharing</h3><p>70% of net profit goes to you, settled the same way every month.</p></div>
-      <div><b>Reliability</b><h3>End-to-end service</h3><p>Listing, pricing, guests, housekeeping and repairs, all handled.</p></div>
-      <div><b>Visibility</b><h3>You see everything</h3><p>Bookings, messages, expenses and income, at any time.</p></div>
-    </div>
-    <div class="both">
-      <div><h3>A professionally run Airbnb</h3><p>Your home earns from guests on the nights you aren't using it.</p></div>
-      <div><h3>A ready vacation home</h3><p>Fully equipped and clean for whenever you, your family or friends visit.</p></div>
-    </div>
-  </div>
-</section>
-
-<section class="ow">
-  <div class="wrap">
-    <div class="eyebrow">Roles &amp; responsibilities</div>
-    <h2>Who does what</h2>
-    <p class="lead">A clear split, so you always know what is yours to decide and what we handle.</p>
-    <div class="roles">
-      <div class="role"><header><h3>Sandcastles</h3><span>Operator</span></header><ul>
-        <li>End-to-end Airbnb operations</li>
-        <li>Pricing, photography, guest handling and housekeeping</li>
-        <li>Utilities, daily maintenance and compliance</li>
-        <li>Periodic maintenance inspections</li>
-      </ul></div>
-      <div class="role"><header><h3>You</h3><span>Owner</span></header><ul>
-        <li>Security access to the home</li>
-        <li>Visibility of all bookings as a co-host</li>
-        <li>Approve any major spends</li>
-        <li>Enjoy a working vacation home</li>
-      </ul></div>
-    </div>
-  </div>
-</section>
-
 <section class="ow alt" id="earnings">
   <div class="wrap">
-    <div class="eyebrow">How you get paid</div>
-    <h2>A simple <em>70 / 30 profit share</em></h2>
-    <p class="lead">Expenses come off the top. Whatever is left is net profit: <b>70% goes to you</b> and 30% to us. Move the sliders to try your own numbers.</p>
+    <div class="eyebrow">What you earn</div>
+    <h2>Airbnb with us vs <em>a long-term tenant</em></h2>
+    <p class="lead">Your share is 70% of what's left after cleaning, utilities, society charges, repairs and Airbnb fees. Your walkthrough comes with a written estimate for your exact home.</p>
+    <div class="vs-wrap"><table class="vs">
+      <thead><tr><th scope="col"><span class="sr">Comparison</span></th><th scope="col" class="us">With Sandcastles</th><th scope="col">Tenant</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Use it yourself</th><td class="us">Any free dates</td><td>Never</td></tr>
+        <tr><th scope="row">Cleaned &amp; checked</th><td class="us">After every stay</td><td>When they leave</td></tr>
+        <tr><th scope="row">Wear &amp; tear</th><td class="us">Fixed within days</td><td>Found at move-out</td></tr>
+        <tr><th scope="row">Getting it back</th><td class="us">30 days' notice</td><td>Can take months</td></tr>
+      </tbody>
+    </table></div>
+    <h3 class="sub-h" id="calculator">Try your own numbers</h3>
     <div class="calc">
       <div>
         <div class="field"><label for="rev">Monthly booking revenue <output id="rev-o"></output></label><input type="range" id="rev" min="20000" max="400000" step="5000" value="100000"></div>
@@ -407,63 +521,151 @@ footer .soc a{color:#e6cf9d;text-decoration:none}footer .brand b{font-size:.9rem
   </div>
 </section>
 
+<section class="ow dark">
+  <div class="wrap">
+    <div class="eyebrow">Your home is protected</div>
+    <h2>Guests come and go. <em>Your home stays cared for.</em></h2>
+    <p class="lead">The worries we hear most from owners, and what we do about each one.</p>
+    <ul class="pcards">
+      <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 16c.8-1.6 5.2-1.6 6 0M14 10h4M14 13h3"/></svg></span><div><h3>Every guest ID-checked</h3><p>Government ID before check-in, names shared with your society, and no unverified bookings.</p></div></li>
+      <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span><div><h3>Damage covered</h3><p>Airbnb's AirCover for Hosts on every booking, plus a security deposit on longer stays.</p></div></li>
+      <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M8 9l2 2 4-4M8 15h8"/></svg></span><div><h3>Checked after every stay</h3><p>Cleaned and checked after each checkout. If anything is off, you get photos on WhatsApp.</p></div></li>
+      <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c.8-3.5 3.5-5 6-5s5.2 1.5 6 5M15 15.5c2.5-.5 5 .8 6 4"/></svg></span><div><h3>Good neighbours</h3><p>Clear house rules for guests, with gate entries and society rules handled by us, not you.</p></div></li>
+      <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg></span><div><h3>Regular inspections</h3><p>Seepage, pests, wiring and appliances checked regularly, so small problems stay small.</p></div></li>
+      <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h6M9 16h6"/></svg></span><div><h3>Licences &amp; compliance</h3><p>Goa Tourism registration, GST invoicing and society NOC, done for you.</p></div></li>
+    </ul>
+  </div>
+</section>
+
 <section class="ow">
   <div class="wrap">
-    <div class="eyebrow">Operating expenses</div>
-    <h2>Every rupee, <em>on record</em></h2>
-    <p class="lead">Expenses are tracked in a shared settlement Google Sheet, and every receipt goes into a shared Google Drive.</p>
-    <ul class="exp">
-      <li><b>Maintenance</b><p>Cleaning, consumables and repairs.</p></li>
-      <li><b>Utilities</b><p>Electricity, internet, CAM charges and property tax.</p></li>
-      <li><b>Accounting</b><p>Tracked line by line in a shared settlement sheet.</p></li>
-      <li><b>Receipts</b><p>Every bill uploaded to a shared Google Drive.</p></li>
-    </ul>
+    <div class="eyebrow">How we work</div>
+    <h2>We manage your home <em>as its operator</em></h2>
+    <p class="lead">Three promises, and a clear split of who does what.</p>
+    <div class="pillars">
+      <div><b>Revenue</b><h3>Transparent sharing</h3><p>70% of net profit goes to you, settled the same way every month.</p></div>
+      <div><b>Reliability</b><h3>End-to-end service</h3><p>Listing, pricing, guests, housekeeping and repairs, all handled.</p></div>
+      <div><b>Visibility</b><h3>You see everything</h3><p>Bookings, messages, expenses and income, at any time.</p></div>
+    </div>
+    <div style="margin-top:22px">
+    <div class="roles">
+      <div class="role"><header><h3>Sandcastles</h3><span>Operator</span></header><ul>
+        <li>End-to-end Airbnb operations</li>
+        <li>Pricing, photography, guest handling and housekeeping</li>
+        <li>Utilities, daily maintenance and compliance</li>
+        <li>Periodic maintenance inspections</li>
+      </ul></div>
+      <div class="role"><header><h3>You</h3><span>Owner</span></header><ul>
+        <li>Security access to the home</li>
+        <li>Visibility of all bookings as a co-host</li>
+        <li>Approve any major spends</li>
+        <li>Enjoy a working vacation home</li>
+      </ul></div>
+    </div>
+    </div>
   </div>
 </section>
 
 <section class="ow alt">
   <div class="wrap">
-    <div class="eyebrow">Owner visibility &amp; control</div>
-    <h2>Always know what's happening <em>in your home</em></h2>
-    <p class="lead">You can call or text us any time, and you can check things yourself whenever you like.</p>
-    <ul class="cards2">
-      <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 7h12v10H3zM15 10l6-3v10l-6-3"/></svg></span><div><h3>Camera access</h3><p>Guest movement detection at the entrance, 24×7.</p></div></li>
-      <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg></span><div><h3>Co-host access</h3><p>Real-time access to every guest message and booking detail on Airbnb.</p></div></li>
-      <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M9 13l2 2 4-4"/></svg></span><div><h3>Right to audit</h3><p>A shared Drive with logs, inventory and every bill.</p></div></li>
-      <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 8"/></svg></span><div><h3>Photo updates</h3><p>Any major service or repair is shared with photos on WhatsApp.</p></div></li>
-    </ul>
-  </div>
-</section>
-
-<section class="ow dark">
-  <div class="wrap">
-    <div class="eyebrow">Exit clarity</div>
-    <h2>Designed for <em>long-term trust</em></h2>
-    <p class="lead">Simple terms, agreed upfront.</p>
-    <div class="terms">
-      <div class="term"><strong>1 year</strong><p>Lock-in period, so we can invest properly in setting up your home.</p></div>
-      <div class="term"><strong>30 days</strong><p>Notice period, the same for both sides.</p></div>
-      <div class="term"><strong>Clean</strong><p>Handover with full reconciliation of income, expenses and inventory.</p></div>
+    <div class="eyebrow">Getting started</div>
+    <h2>From walkthrough <em>to first payout</em></h2>
+    <ol class="tl">
+      <li><span class="n" aria-hidden="true">1</span><div><b>Walkthrough</b><p>We visit your home and send a written earnings estimate.</p></div></li>
+      <li><span class="n" aria-hidden="true">2</span><div><b>Set-up plan</b><p>Every fix and furnishing cost listed before you agree to anything.</p></div></li>
+      <li><span class="n" aria-hidden="true">3</span><div><b>Styling &amp; photos</b><p>Deepika styles the home. Professional photos and listing.</p></div></li>
+      <li><span class="n" aria-hidden="true">4</span><div><b>Live on Airbnb</b><p>Bookings open, and you get co-host access to see everything.</p></div></li>
+      <li><span class="n" aria-hidden="true">5</span><div><b>First payout</b><p>Your statement and 70% share, then the same way every month.</p></div></li>
+    </ol>
+    <div class="start2">
+      <div class="box"><h3>What it costs you to start</h3><p><b>No upfront management fee.</b> You pay only for fixes and furnishing you approve, at cost, with every bill shared. Our 30% comes out of profit, so we only earn when you do.</p></div>
+      <div class="box gold"><h3>Simple, fair terms</h3>
+        <div class="mini-terms"><div><strong>1 year</strong><span>lock-in, so we can invest properly in setting up your home</span></div><div><strong>30 days</strong><span>notice, the same for both sides</span></div><div><strong>Clean</strong><span>handover with full reconciliation of income, expenses and inventory</span></div></div>
+      </div>
     </div>
   </div>
 </section>
 
 <section class="ow">
   <div class="wrap">
-    <div class="eyebrow">The team</div>
-    <h2>Who you'll work with</h2>
-    <p class="lead">5 years of hosting, 32 homes and 936 guest reviews across Goa, Bengaluru, Vadodara and Thrissur.</p>
-    <div class="team">
-      <div class="mate"><img src="/img/rohit.jpg" alt="Rohit Aggarwal" width="640" height="800"><b>Rohit Aggarwal</b><span>Automotive Engineer · Operations &amp; Owners</span></div>
-      <div class="mate"><img src="/img/deepika.jpg" alt="Deepika Shivaramaiah" width="640" height="800"><b>Deepika Shivaramaiah</b><span>Interior Designer &amp; Civil Engineer · Guests &amp; Homes</span></div>
-    </div>
-    <div class="final">
-      <div><h3>Have a home that sits empty?</h3><p>Call or WhatsApp +91 80727 70364, or email aggrohit.aggarwal@gmail.com</p></div>
-      <div class="ctas">
-        <a class="btn btn-gold" href="https://wa.me/918072770364?text=Hi%20Sandcastles%2C%20I%27d%20like%20to%20talk%20about%20listing%20my%20home." target="_blank" rel="noopener">Talk to us on WhatsApp</a>
-        <a class="btn btn-ghost" href="/#stays">See our homes</a>
+    <div class="eyebrow">Full transparency</div>
+    <h2>A clear statement, <em>every month</em></h2>
+    <div class="tgrid">
+      <div class="stmt" aria-label="Sample monthly statement">
+        <div class="stmt-h"><b>Monthly statement</b><span>Sample · 2 BHK</span></div>
+        <ul>
+          <li><span>Booking revenue</span><b>₹1,00,000</b></li>
+          <li class="m"><span>Cleaning &amp; laundry</span><b>− ₹8,000</b></li>
+          <li class="m"><span>Society maintenance</span><b>− ₹3,500</b></li>
+          <li class="m"><span>Electricity &amp; internet</span><b>− ₹4,000</b></li>
+          <li class="m"><span>Consumables</span><b>− ₹2,500</b></li>
+          <li class="m"><span>Airbnb service fee</span><b>− ₹2,000</b></li>
+          <li class="net"><span>Net profit</span><b>₹80,000</b></li>
+          <li class="you"><span>Your 70%</span><b>₹56,000</b></li>
+        </ul>
+        <p class="stmt-f">Sample figures. Every line links to a receipt in your shared Drive.</p>
+      </div>
+      <div>
+        <p class="lead">The same figures you'd see if you did the accounts yourself. Check any of them, any time.</p>
+        <ul class="tlist">
+          <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-5 8-5s6.5 1 8 5"/></svg></span><div><h3>Co-host access on Airbnb</h3><p>Every booking, guest message and payout in your own Airbnb app, live.</p></div></li>
+          <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 9h16M4 15h16M10 3v18"/></svg></span><div><h3>Shared settlement sheet</h3><p>Every expense line by line, with the receipt in a shared Google Drive.</p></div></li>
+          <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span><div><h3>Photos before major repairs</h3><p>Major spends wait for your OK on WhatsApp.</p></div></li>
+          <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 7h12v10H3zM15 10l6-3v10l-6-3"/></svg></span><div><h3>Camera at the entrance</h3><p>Guest movement detection at the entrance, 24×7.</p></div></li>
+        </ul>
       </div>
     </div>
+  </div>
+</section>
+
+<section class="ow alt">
+  <div class="wrap use">
+    <img src="/img/hero-4.jpg" srcset="/img/hero-4-m.jpg 900w, /img/hero-4.jpg 1800w" sizes="(max-width:860px) 100vw, 45vw" alt="A made-up bedroom in one of our homes, with a garden view" width="1800" height="1350">
+    <div>
+      <div class="eyebrow">Still your home</div>
+      <h2>Stay whenever you like. <em>We'll have it ready.</em></h2>
+      <p class="lead">Block dates in the shared calendar and arrive to fresh linen, a stocked kitchen and everything working.</p>
+      <ul class="ucards">
+        <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span><div><h3>Block your dates</h3><p>Reserve any free dates in the shared calendar.</p></div></li>
+        <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M15 8l2 2"/></svg></span><div><h3>No visit fee</h3><p>Cleaning after your stay is charged at cost.</p></div></li>
+        <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c.8-3.5 3.5-5 6-5s5.2 1.5 6 5M15 15.5c2.5-.5 5 .8 6 4"/></svg></span><div><h3>Family and friends too</h3><p>The home is ready for whoever you send.</p></div></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="ow">
+  <div class="wrap">
+    <div class="eyebrow">Questions owners ask</div>
+    <h2>Before you <em>decide</em></h2>
+    <div class="faq">
+      <details><summary>Does my home need to be furnished?</summary><p>No. We take on empty homes too, and give you a furnishing plan with costs before you spend anything.</p></details>
+      <details><summary>What if a guest damages something?</summary><p>We fix it first and claim it from the guest's security deposit or Airbnb's AirCover for Hosts. You see the photos and the claim.</p></details>
+      <details><summary>Will my society allow it?</summary><p>We check your society's rules at the walkthrough, and handle guest registrations, gate entries and neighbour questions.</p></details>
+      <details><summary>Who pays the taxes?</summary><p>The income is yours, so tax on your share is filed in your name. Your monthly statements and the shared expense sheet give your CA everything they need.</p></details>
+      <details><summary>What if I want my home back?</summary><p>After the first year, either side can end it with 30 days' notice. We hand back the home with a full reconciliation of income, expenses and inventory.</p></details>
+      <details><summary>I don't live in the same city. Is that a problem?</summary><p>No. You never need to visit to run the home. We handle everything on the ground and keep you updated on WhatsApp.</p></details>
+    </div>
+  </div>
+</section>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does my home need to be furnished?", "acceptedAnswer": {"@type": "Answer", "text": "No. We take on empty homes too, and give you a furnishing plan with costs before you spend anything."}}, {"@type": "Question", "name": "What if a guest damages something?", "acceptedAnswer": {"@type": "Answer", "text": "We fix it first and claim it from the guest's security deposit or Airbnb's AirCover for Hosts. You see the photos and the claim."}}, {"@type": "Question", "name": "Will my society allow it?", "acceptedAnswer": {"@type": "Answer", "text": "We check your society's rules at the walkthrough, and handle guest registrations, gate entries and neighbour questions."}}, {"@type": "Question", "name": "Who pays the taxes?", "acceptedAnswer": {"@type": "Answer", "text": "The income is yours, so tax on your share is filed in your name. Your monthly statements and the shared expense sheet give your CA everything they need."}}, {"@type": "Question", "name": "What if I want my home back?", "acceptedAnswer": {"@type": "Answer", "text": "After the first year, either side can end it with 30 days' notice. We hand back the home with a full reconciliation of income, expenses and inventory."}}, {"@type": "Question", "name": "I don't live in the same city. Is that a problem?", "acceptedAnswer": {"@type": "Answer", "text": "No. You never need to visit to run the home. We handle everything on the ground and keep you updated on WhatsApp."}}]}</script>
+
+<section class="ow dark" id="contact">
+  <div class="wrap close">
+    <div>
+      <div class="eyebrow">Talk to the founders</div>
+      <h2>Find out what your home <em>could earn</em></h2>
+      <p class="lead">Tell us the city and size. We'll send a written estimate within 24 hours, with no obligation.</p>
+      <div class="team">
+        <div class="mate"><img src="/img/rohit.jpg" alt="Rohit Aggarwal" width="640" height="800"><b>Rohit Aggarwal</b><span>Owners &amp; pricing · Automotive engineer</span></div>
+        <div class="mate"><img src="/img/deepika.jpg" alt="Deepika Shivaramaiah" width="640" height="800"><b>Deepika Shivaramaiah</b><span>Styling, guests &amp; homes · Interior designer and civil engineer</span></div>
+      </div>
+    </div>
+    <ul class="crow">
+      <li><a href="#estimate"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span><span><small>Fastest</small><b>Get my earnings estimate</b></span></a></li>
+      <li><a href="https://wa.me/918072770364?text=Hi%20Sandcastles%2C%20I%27d%20like%20to%20talk%20about%20listing%20my%20home." target="_blank" rel="noopener"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z"/><path d="M9 9.5c.3 2 1.8 3.8 4 4.6l1.2-1.2 2 .8-.4 1.6c-3.5.5-7.6-3.4-7.3-7l1.6-.3.8 2z"/></svg></span><span><small>WhatsApp or call</small><b>+91 80727 70364</b></span></a></li>
+      <li><div class="nolink"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span><span><small>Email</small><b class="sel">aggrohit.aggarwal@gmail.com</b></span></div></li>
+    </ul>
   </div>
 </section>
 </main>
@@ -486,6 +688,17 @@ footer .soc a{color:#e6cf9d;text-decoration:none}footer .brand b{font-size:.9rem
     const t=rev||1; $('b-o').style.width=(own/t*100)+'%'; $('b-p').style.width=(op/t*100)+'%'; $('b-e').style.width=(exp/t*100)+'%';
   }
   $('rev').oninput=upd; $('exp').oninput=upd; upd();
+})();
+(function(){
+  const f=document.getElementById('estimate');
+  f.addEventListener('submit',e=>{
+    e.preventDefault();
+    const d=new FormData(f);
+    let m="Hi Sandcastles, I'd like a free earnings estimate for my home.\nCity: "+d.get('city')+"\nSize: "+d.get('size')+"\nFurnishing: "+d.get('furnishing');
+    const a=(d.get('area')||'').trim(); if(a) m+="\nArea / society: "+a;
+    const u='https://wa.me/918072770364?text='+encodeURIComponent(m);
+    const w=window.open(u,'_blank','noopener'); if(!w) location.href=u;
+  });
 })();
 </script>
 </body>

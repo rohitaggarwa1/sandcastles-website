@@ -60,6 +60,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .nav{display:flex;gap:26px;align-items:center}
 .nav a{color:var(--on-navy-muted);text-decoration:none;font-size:.92rem;font-weight:500}
 .nav a:hover{color:var(--on-navy)}
+.nav a.nav-own{color:#e6cf9d;font-weight:700}
 .nav .btn{padding:.7em 1.1em;font-size:.85rem}
 .nav a.btn-gold,.nav a.btn-gold:hover{color:#14213a}
 @media (max-width:820px){
@@ -225,7 +226,7 @@ footer .soc a{color:#e6cf9d;text-decoration:none}footer .brand b{font-size:.9rem
     </a>
     <nav class="nav" aria-label="Main">
       <a href="/#stays">Stays</a>
-      <a href="/owners/">For owners</a>
+      <a class="nav-own" href="/owners/">List your home</a>
       <a href="/#about">About</a>
       <a href="/shop/" aria-current="page" style="color:#f3ead8">Shop</a>
       <a href="/#contact">Contact</a>
