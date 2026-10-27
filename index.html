@@ -71,7 +71,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 
 /* hero: full-bleed photo slideshow under a navy gradient */
 .hero{position:relative;background:var(--navy);color:var(--on-navy);overflow:hidden;isolation:isolate}
-.slides{position:absolute;inset:0;z-index:-2}
+.slides{position:absolute;inset:0;z-index:-2;overflow:hidden}
 .slides img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.06);transition:opacity 1.6s ease, transform 9s ease-out}
 .slides img.on{opacity:1;transform:scale(1)}
 .hero::before{content:"";position:absolute;inset:0;z-index:-1;background:
@@ -92,7 +92,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .stat span{font-size:.82rem;color:var(--on-navy-muted);letter-spacing:.04em}
 @media (max-width:900px){
   .slides{inset:0 0 auto 0;height:clamp(240px, 58vw, 380px)}
-  .hero::before{inset:0 0 auto 0;height:clamp(240px, 58vw, 380px);background:linear-gradient(0deg, var(--navy) 0%, rgba(20,33,58,.55) 30%, rgba(20,33,58,0) 60%)}
+  .hero::before{inset:0 0 auto 0;height:calc(clamp(240px, 58vw, 380px) + 2px);background:linear-gradient(0deg, var(--navy) 0%, rgba(20,33,58,.55) 30%, rgba(20,33,58,0) 60%)}
   .hero .inner{min-height:0;justify-content:flex-start;padding-block:calc(clamp(240px, 58vw, 380px) - 28px) 32px}
   .hero .eyebrow{letter-spacing:.18em;line-height:1.5}
   .hero h1{font-size:clamp(2.2rem,9vw,3rem);margin:10px 0 14px}
