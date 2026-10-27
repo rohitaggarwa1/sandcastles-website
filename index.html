@@ -91,9 +91,13 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .stat b{display:block;font:600 1.9rem/1 var(--f-display);color:var(--gold-soft);font-variant-numeric:tabular-nums}
 .stat span{font-size:.82rem;color:var(--on-navy-muted);letter-spacing:.04em}
 @media (max-width:900px){
-  .hero::before{background:linear-gradient(0deg, rgba(14,23,42,.97) 0%, rgba(14,23,42,.88) 45%, rgba(14,23,42,.25) 80%, rgba(14,23,42,.1) 100%)}
-  .hero .inner{justify-content:flex-end;min-height:640px;padding-block:220px 32px}
-  .dots{top:calc(env(safe-area-inset-top,0px) + 84px);bottom:auto}
+  .slides{inset:0 0 auto 0;height:clamp(240px, 58vw, 380px)}
+  .hero::before{inset:0 0 auto 0;height:clamp(240px, 58vw, 380px);background:linear-gradient(0deg, var(--navy) 0%, rgba(20,33,58,.55) 30%, rgba(20,33,58,0) 60%)}
+  .hero .inner{min-height:0;justify-content:flex-start;padding-block:calc(clamp(240px, 58vw, 380px) - 28px) 32px}
+  .hero .eyebrow{letter-spacing:.18em;line-height:1.5}
+  .hero h1{font-size:clamp(2.2rem,9vw,3rem);margin:10px 0 14px}
+  .hero p.lede{font-size:1rem;margin-bottom:24px}
+  .dots{top:auto;bottom:auto;top:calc(clamp(240px, 58vw, 380px) - 52px)}
   .stats .wrap{grid-template-columns:repeat(3,1fr);row-gap:22px}}
 @media (max-width:480px){.stats .wrap{grid-template-columns:repeat(2,1fr)}}
 @media (prefers-reduced-motion:reduce){.slides img{transition:none;transform:none}}
@@ -237,7 +241,7 @@ footer .brand b{font-size:.9rem}
   </div>
   <div class="wrap inner">
     <div class="copy">
-      <div class="eyebrow">Airbnb property management · Across India</div>
+      <div class="eyebrow">Airbnb management · Across India</div>
       <h1>Homes we look after <em>like our own.</em></h1>
       <p class="lede">We set up and run Airbnb homes for owners anywhere in India. Today that's 32 homes and rooms in Goa, Bengaluru, Vadodara and Thrissur, each cleaned, checked and hosted by our own team.</p>
       <div class="ctas">
