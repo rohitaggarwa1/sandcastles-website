@@ -62,7 +62,12 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .nav a:hover{color:var(--on-navy)}
 .nav .btn{padding:.7em 1.1em;font-size:.85rem}
 .nav a.btn-gold,.nav a.btn-gold:hover{color:#14213a}
-@media (max-width:820px){.nav a:not(.btn){display:none}}
+@media (max-width:820px){
+  .top .wrap{flex-wrap:wrap;row-gap:8px;padding-block:10px 8px}
+  .nav{order:3;width:100%;justify-content:space-between;gap:14px;overflow-x:auto;padding-top:8px;border-top:1px solid rgba(196,154,74,.2)}
+  .nav a:not(.btn){font-size:.88rem;white-space:nowrap}
+  .nav .btn{display:none}
+}
 
 /* hero: full-bleed photo slideshow under a navy gradient */
 .hero{position:relative;background:var(--navy);color:var(--on-navy);overflow:hidden;isolation:isolate}
@@ -320,14 +325,14 @@ footer .brand b{font-size:.9rem}
     <div class="founders">
       <div class="founder">
         <img class="ph" src="img/rohit.jpg" alt="Rohit, co-founder of Sandcastles" loading="lazy" width="640" height="800">
-        <b>Rohit</b><span>Co-founder · Operations</span>
-        <p>Engineer from VIT Vellore. Runs pricing, guests and the owner side of the business.</p>
+        <b>Rohit</b><span>Co-founder · Operations &amp; Owners</span>
+        <p>Engineer from VIT Vellore. Runs pricing, bookings and the owner side of the business.</p>
         <a href="https://www.airbnb.co.in/users/show/153546484" target="_blank" rel="noopener">Airbnb profile →</a>
       </div>
       <div class="founder">
         <img class="ph" src="img/deepika.jpg" alt="Deepika, co-founder of Sandcastles" loading="lazy" width="640" height="800">
-        <b>Deepika</b><span>Co-founder · Interiors</span>
-        <p>Interior designer who styles each home before it goes live.</p>
+        <b>Deepika</b><span>Co-founder · Guests &amp; Homes</span>
+        <p>Civil engineer and interior designer. Styles each home before it goes live, and looks after guests, housekeeping and upkeep.</p>
         <a href="https://www.airbnb.co.in/users/show/183360061" target="_blank" rel="noopener">Airbnb profile →</a>
       </div>
     </div>
