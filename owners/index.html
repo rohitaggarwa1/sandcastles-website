@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta property="og:title" content="Sandcastles for Owners">
+<meta property="og:description" content="We run your home as a professionally managed Airbnb, with transparent revenue sharing and full owner visibility.">
+<meta property="og:image" content="/img/hero-1.jpg">
+<title>Sandcastles for Owners</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Sandcastles Airbnb management for homeowners across India: end-to-end operations, transparent revenue sharing, full owner visibility and clear exit terms.">
+<link rel="canonical" href="https://sandcastlesstays.com/owners/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Marcellus&family=Manrope:wght@400;500;600;700&display=swap">
+<style>body{margin:0}img{max-width:100%}
+/* Layout: navy masthead with logo → stays gallery filtered by city → owners band → founders → contact. Brand = navy + sand gold, from the Instagram identity. */
+:root{
+  --navy:#14213a; --navy-2:#1d2d4d;
+  --gold:#c49a4a; --gold-soft:#e6cf9d;
+  --sand:#f7f2e8; --card:#fffdf8; --line:#e5dccb;
+  --ink:#1a2236; --muted:#5f6779;
+  --bg:var(--sand); --fg:var(--ink);
+  --on-navy:#f3ead8; --on-navy-muted:#b9bfcc;
+  --f-display:"Playfair Display", Georgia, "Times New Roman", serif;
+  --f-caps:"Marcellus", "Trajan Pro", Georgia, serif;
+  --f-body:"Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1626; --fg:#ece4d4; --card:#16213a; --line:#2a3854; --muted:#a3aabb;
+  --sand:#121c31; --ink:#ece4d4; --gold:#d6ae62; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0e1626; --fg:#ece4d4; --card:#16213a; --line:#2a3854; --muted:#a3aabb;
+  --sand:#121c31; --ink:#ece4d4; --gold:#d6ae62; color-scheme:dark }
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{background:var(--bg);color:var(--fg);font:400 16px/1.6 var(--f-body);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:4px}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(20px, env(safe-area-inset-left,0px));padding-right:max(20px, env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);font-weight:600;text-wrap:balance;margin:0;line-height:1.15}
+.eyebrow{font:400 .78rem/1 var(--f-caps);letter-spacing:.28em;text-transform:uppercase;color:var(--gold)}
+.btn{display:inline-flex;align-items:center;gap:.5em;font:600 .95rem/1 var(--f-body);padding:.95em 1.4em;border-radius:999px;text-decoration:none;border:1px solid transparent;cursor:pointer;transition:transform .2s, background .2s}
+.btn:hover{transform:translateY(-1px)}
+.btn-gold{background:var(--gold);color:#14213a}
+.btn-ghost{border-color:rgba(230,207,157,.5);color:var(--on-navy)}
+.btn-ghost:hover{background:rgba(230,207,157,.1)}
+
+/* masthead */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--navy)}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:rgba(20,33,58,.96);backdrop-filter:blur(8px);border-bottom:1px solid rgba(196,154,74,.25)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:12px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--on-navy)}
+.brand svg{width:40px;height:40px;flex:none}
+.brand b{font:400 1.05rem/1 var(--f-caps);letter-spacing:.24em}
+.brand small{display:block;font:500 .6rem/1 var(--f-body);letter-spacing:.2em;color:var(--gold-soft);margin-top:5px}
+.nav{display:flex;gap:26px;align-items:center}
+.nav a{color:var(--on-navy-muted);text-decoration:none;font-size:.92rem;font-weight:500}
+.nav a:hover{color:var(--on-navy)}
+.nav .btn{padding:.7em 1.1em;font-size:.85rem}
+.nav a.btn-gold,.nav a.btn-gold:hover{color:#14213a}
+@media (max-width:820px){
+  .top .wrap{flex-wrap:wrap;row-gap:8px;padding-block:10px 8px}
+  .nav{order:3;width:100%;justify-content:space-between;gap:14px;overflow-x:auto;padding-top:8px;border-top:1px solid rgba(196,154,74,.2)}
+  .nav a:not(.btn){font-size:.88rem;white-space:nowrap}
+  .nav .btn{display:none}
+}
+
+/* hero: full-bleed photo slideshow under a navy gradient */
+.hero{position:relative;background:var(--navy);color:var(--on-navy);overflow:hidden;isolation:isolate}
+.slides{position:absolute;inset:0;z-index:-2}
+.slides img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.06);transition:opacity 1.6s ease, transform 9s ease-out}
+.slides img.on{opacity:1;transform:scale(1)}
+.hero::before{content:"";position:absolute;inset:0;z-index:-1;background:
+  linear-gradient(90deg, rgba(14,23,42,.94) 0%, rgba(14,23,42,.82) 34%, rgba(14,23,42,.35) 62%, rgba(14,23,42,.08) 100%),
+  linear-gradient(0deg, rgba(14,23,42,.85) 0%, rgba(14,23,42,0) 32%)}
+.hero .inner{min-height:clamp(560px, 78vh, 760px);display:flex;flex-direction:column;justify-content:center;padding-block:72px 40px}
+.hero .copy{max-width:600px}
+.hero h1{font-size:clamp(2.5rem,5.6vw,4.6rem);font-weight:600;margin:18px 0 20px;text-shadow:0 2px 24px rgba(0,0,0,.25)}
+.hero h1 em{font-style:italic;color:var(--gold-soft);font-weight:500}
+.hero p.lede{color:#d9dce4;font-size:1.1rem;max-width:33em;margin:0 0 32px}
+.hero .ctas{display:flex;flex-wrap:wrap;gap:12px}
+.dots{position:absolute;right:max(20px, env(safe-area-inset-right,0px));bottom:118px;display:flex;gap:8px;z-index:2}
+.dots button{width:28px;height:3px;border:0;padding:0;border-radius:2px;background:rgba(243,234,216,.35);cursor:pointer}
+.dots button[aria-current="true"]{background:var(--gold-soft)}
+.stats{position:relative;border-top:1px solid rgba(196,154,74,.3);background:rgba(14,23,42,.55);backdrop-filter:blur(6px)}
+.stats .wrap{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;padding-block:24px}
+.stat b{display:block;font:600 1.9rem/1 var(--f-display);color:var(--gold-soft);font-variant-numeric:tabular-nums}
+.stat span{font-size:.82rem;color:var(--on-navy-muted);letter-spacing:.04em}
+@media (max-width:900px){
+  .hero::before{background:linear-gradient(0deg, rgba(14,23,42,.97) 0%, rgba(14,23,42,.88) 45%, rgba(14,23,42,.25) 80%, rgba(14,23,42,.1) 100%)}
+  .hero .inner{justify-content:flex-end;min-height:640px;padding-block:220px 32px}
+  .dots{top:calc(env(safe-area-inset-top,0px) + 84px);bottom:auto}
+  .stats .wrap{grid-template-columns:repeat(3,1fr);row-gap:22px}}
+@media (max-width:480px){.stats .wrap{grid-template-columns:repeat(2,1fr)}}
+@media (prefers-reduced-motion:reduce){.slides img{transition:none;transform:none}}
+
+/* stays */
+section{padding-block:84px}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:28px}
+.sec-head h2{font-size:clamp(1.9rem,3.6vw,2.7rem);margin-top:12px}
+.sec-head p{color:var(--muted);max-width:30em;margin:0}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.chip{font:600 .86rem/1 var(--f-body);padding:.7em 1.05em;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--fg);cursor:pointer}
+.chip span{color:var(--muted);font-weight:500;margin-left:4px}
+.chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#f3ead8}
+.chip[aria-pressed="true"] span{color:var(--gold-soft)}
+:root[data-theme="dark"] .chip[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:#14213a}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .chip[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:#14213a}:root:not([data-theme="light"]) .chip[aria-pressed="true"] span{color:#3a3020}}
+:root[data-theme="dark"] .chip[aria-pressed="true"] span{color:#3a3020}
+.sub-filters{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:28px;font-size:.88rem;color:var(--muted)}
+.sub-filters button{background:none;border:0;padding:4px 0;font:inherit;color:var(--muted);cursor:pointer;border-bottom:1.5px solid transparent}
+.sub-filters button[aria-pressed="true"]{color:var(--fg);border-color:var(--gold);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:26px}
+.stay{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:transform .25s, box-shadow .25s}
+.stay:hover{transform:translateY(-3px);box-shadow:0 14px 30px -18px rgba(20,33,58,.45)}
+.stay .ph{aspect-ratio:16/10.5;max-width:100%;overflow:hidden;background:var(--line);position:relative}
+.stay .ph img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}
+.stay:hover .ph img{transform:scale(1.04)}
+.stay .tag{position:absolute;left:12px;top:12px;background:rgba(20,33,58,.88);color:#f3ead8;font:500 .7rem/1 var(--f-caps);letter-spacing:.16em;text-transform:uppercase;padding:.6em .8em;border-radius:6px}
+.stay .body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:8px;flex:1}
+.stay .meta{display:flex;justify-content:space-between;gap:10px;font-size:.8rem;color:var(--muted)}
+.stay .rate{color:var(--fg);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.stay .rate i{font-style:normal;color:var(--gold)}
+.stay .rate small{color:var(--muted);font-weight:500}
+.stay h3{font-size:1.15rem;line-height:1.3}
+.stay .go{margin-top:auto;padding-top:8px;font-size:.85rem;font-weight:600;color:var(--gold);display:flex;align-items:center;gap:6px}
+.new{color:var(--gold);font-weight:600}
+
+/* owners */
+.owners{background:var(--navy);color:var(--on-navy)}
+.owners .sec-head p{color:var(--on-navy-muted)}
+.owners h2 em{font-style:italic;color:var(--gold-soft);font-weight:500}
+.svc{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(196,154,74,.22);border:1px solid rgba(196,154,74,.22);border-radius:var(--r);overflow:hidden}
+.svc div{background:var(--navy);padding:26px 24px}
+.svc h3{font-size:1.15rem;color:var(--gold-soft);margin-bottom:8px}
+.svc p{margin:0;color:var(--on-navy-muted);font-size:.93rem}
+@media (max-width:860px){.svc{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.svc{grid-template-columns:1fr}}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:56px;counter-reset:s}
+.steps li{list-style:none;border-top:1px solid rgba(196,154,74,.45);padding-top:16px;counter-increment:s}
+.steps li::before{content:"Step " counter(s);display:block;font:400 .72rem/1 var(--f-caps);letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.steps b{display:block;font-family:var(--f-display);font-size:1.12rem;font-weight:600;margin-bottom:4px}
+.steps span{font-size:.9rem;color:var(--on-navy-muted)}
+.steps{padding:0}
+@media (max-width:860px){.steps{grid-template-columns:1fr 1fr}}
+@media (max-width:480px){.steps{grid-template-columns:1fr}}
+.owner-cta{margin-top:48px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.owner-cta p{margin:0 12px 0 0;color:var(--on-navy-muted)}
+
+/* about */
+.about .wrap{display:grid;grid-template-columns:.9fr 1.1fr;gap:56px;align-items:center}
+.about h2{font-size:clamp(1.9rem,3.6vw,2.6rem);margin:12px 0 18px}
+.about p{color:var(--muted);max-width:36em}
+.founders{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.founder{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px}
+.founder .ini{width:46px;height:46px;border-radius:50%;background:var(--navy);color:#e6cf9d;display:grid;place-items:center;font:600 1.1rem/1 var(--f-display);margin-bottom:14px}
+.founder b{font-family:var(--f-display);font-size:1.2rem;display:block}
+.founder span{font-size:.85rem;color:var(--muted)}
+.founder p{font-size:.9rem;margin:10px 0 0}
+.founder a{font-size:.85rem;font-weight:600;color:var(--gold);text-decoration:none;display:inline-block;margin-top:10px}
+@media (max-width:860px){.about .wrap{grid-template-columns:1fr;gap:32px}}
+@media (max-width:440px){.founders{grid-template-columns:1fr}}
+
+/* contact */
+.contact{border-top:1px solid var(--line)}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.cc{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.cc .eyebrow{font-size:.68rem}
+.cc .val{font-weight:600;font-size:1rem;word-break:break-word;user-select:all}
+.cc .acts{display:flex;gap:14px;margin-top:6px;font-size:.85rem}
+.cc .acts a,.cc .acts button{background:none;border:0;padding:0;font:600 .85rem var(--f-body);color:var(--gold);cursor:pointer;text-decoration:none}
+@media (max-width:900px){.cards{grid-template-columns:1fr 1fr}}
+@media (max-width:480px){.cards{grid-template-columns:1fr}}
+footer{background:var(--navy);color:var(--on-navy-muted);font-size:.85rem}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;padding-block:28px}
+footer .brand b{font-size:.9rem}
+</style>
+</head>
+<body>
+
+<style>
+.ow-hero{background:var(--navy);color:var(--on-navy);position:relative;overflow:hidden;isolation:isolate}
+.ow-hero img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
+.ow-hero::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(14,23,42,.95) 0%,rgba(14,23,42,.85) 40%,rgba(14,23,42,.35) 75%,rgba(14,23,42,.15) 100%)}
+.ow-hero .wrap{padding-block:88px 80px}
+.ow-hero h1{font-size:clamp(2.4rem,5.6vw,4.4rem);margin:16px 0 18px;max-width:12em}
+.ow-hero h1 em{font-style:italic;color:var(--gold-soft);font-weight:500}
+.ow-hero p{color:#d9dce4;font-size:1.1rem;max-width:32em;margin:0 0 30px}
+.ow-hero .ctas{display:flex;flex-wrap:wrap;gap:12px}
+@media (max-width:760px){.ow-hero::before{background:linear-gradient(0deg,rgba(14,23,42,.97) 0%,rgba(14,23,42,.85) 55%,rgba(14,23,42,.45) 100%)}.ow-hero .wrap{padding-block:64px 48px}}
+.ow{padding-block:76px}
+.ow.alt{background:var(--card);border-block:1px solid var(--line)}
+.ow.dark{background:var(--navy);color:var(--on-navy)}
+.ow h2{font-size:clamp(1.8rem,3.6vw,2.6rem);margin:12px 0 10px}
+.ow h2 em{font-style:italic;color:var(--gold);font-weight:500}
+.ow.dark h2 em{color:var(--gold-soft)}
+.ow .lead{color:var(--muted);max-width:40em;margin:0 0 32px}
+.ow.dark .lead{color:var(--on-navy-muted)}
+.cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;list-style:none;padding:0;margin:0}
+.cards3 li,.cards2 li{display:flex;gap:14px;align-items:flex-start;padding:20px;border-radius:12px;background:var(--card);border:1px solid var(--line)}
+.ow.alt .cards3 li{background:var(--bg)}
+.ic{flex:none;width:40px;height:40px;border-radius:10px;background:rgba(196,154,74,.14);display:grid;place-items:center}
+.ic svg{width:21px;height:21px;stroke:var(--gold);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.cards3 h3,.cards2 h3{font:700 1.04rem/1.3 var(--f-body);margin-bottom:4px}
+.cards3 p,.cards2 p{margin:0;color:var(--muted);font-size:.93rem;line-height:1.5}
+@media (max-width:900px){.cards3{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.cards3{grid-template-columns:1fr}}
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(196,154,74,.3);border:1px solid rgba(196,154,74,.3);border-radius:var(--r);overflow:hidden}
+.pillars div{background:var(--navy);padding:28px 26px}
+.pillars b{display:block;font:400 .74rem/1 var(--f-caps);letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.pillars h3{font-size:1.4rem;color:#f3ead8;margin-bottom:6px}
+.pillars p{margin:0;color:var(--on-navy-muted);font-size:.95rem}
+.both{margin-top:22px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.both div{padding:20px 22px;border-radius:12px;border:1px solid rgba(214,174,98,.5);background:linear-gradient(135deg,rgba(214,174,98,.12),rgba(214,174,98,.02))}
+.both h3{font-size:1.15rem;color:#f3ead8;margin-bottom:4px}
+.both p{margin:0;color:#d4d8e2;font-size:.93rem}
+@media (max-width:760px){.pillars,.both{grid-template-columns:1fr}}
+.roles{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.role{border:1px solid var(--line);border-radius:var(--r);background:var(--card);overflow:hidden}
+.role header{padding:16px 22px;background:var(--navy);color:#f3ead8;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.role header h3{font-size:1.3rem}
+.role header span{font-size:.82rem;color:#e6cf9d}
+.role ul{list-style:none;margin:0;padding:8px 22px 14px}
+.role li{padding:11px 0 11px 26px;border-bottom:1px solid var(--line);position:relative;font-size:.97rem}
+.role li:last-child{border-bottom:0}
+.role li::before{content:"";position:absolute;left:2px;top:17px;width:12px;height:7px;border-left:2px solid var(--gold);border-bottom:2px solid var(--gold);transform:rotate(-45deg)}
+@media (max-width:700px){.roles{grid-template-columns:1fr}}
+.calc{display:grid;grid-template-columns:.95fr 1.05fr;gap:28px;align-items:start}
+.models{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.models button{font:600 .9rem/1 var(--f-body);padding:.8em 1.1em;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--fg);cursor:pointer}
+.models button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#f3ead8}
+.mdesc{margin:0 0 22px;color:var(--muted);font-size:.95rem}
+.mdesc b{color:var(--fg)}
+.field{margin-bottom:18px}
+.field label{display:flex;justify-content:space-between;font-weight:600;font-size:.9rem;margin-bottom:8px}
+.field output{font-variant-numeric:tabular-nums;color:var(--gold)}
+.field input[type=range]{width:100%;accent-color:#c49a4a}
+.field.hidden{display:none}
+.result{border-radius:var(--r);background:var(--navy);color:var(--on-navy);padding:26px}
+.result .row{display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-bottom:1px solid rgba(196,154,74,.22);font-variant-numeric:tabular-nums;gap:10px}
+.result .row span{color:var(--on-navy-muted);font-size:.93rem}
+.result .row b{font-weight:600}
+.result .big{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.result .big div{padding:16px;border-radius:12px;background:rgba(255,255,255,.05)}
+.result .big div.you{background:rgba(214,174,98,.16);border:1px solid rgba(214,174,98,.5)}
+.result .big small{display:block;font:400 .7rem/1 var(--f-caps);letter-spacing:.2em;text-transform:uppercase;color:var(--gold-soft);margin-bottom:8px}
+.result .big strong{font:600 1.8rem/1 var(--f-display);font-variant-numeric:tabular-nums}
+.result .big em{display:block;font-style:normal;font-size:.8rem;color:var(--on-navy-muted);margin-top:6px}
+.bar{display:flex;height:10px;border-radius:6px;overflow:hidden;margin-top:18px;background:rgba(255,255,255,.08)}
+.bar i{display:block;height:100%;transition:width .3s}
+.bar .o{background:#e6cf9d}.bar .p{background:#6e7a94}.bar .e{background:#3a4762}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:.78rem;color:var(--on-navy-muted)}
+.legend span::before{content:"";display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:-1px;background:var(--c)}
+.fine{font-size:.8rem;color:var(--on-navy-muted);margin:14px 0 0}
+@media (max-width:860px){.calc{grid-template-columns:1fr}}
+.exp{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;list-style:none;padding:0;margin:0}
+.exp li{padding:20px;border-top:2px solid var(--gold);background:var(--card);border-radius:0 0 12px 12px;border-inline:1px solid var(--line);border-bottom:1px solid var(--line)}
+.exp b{display:block;font-family:var(--f-display);font-size:1.15rem;margin-bottom:6px}
+.exp p{margin:0;color:var(--muted);font-size:.92rem}
+@media (max-width:860px){.exp{grid-template-columns:1fr 1fr}}
+@media (max-width:480px){.exp{grid-template-columns:1fr}}
+.cards2{display:grid;grid-template-columns:1fr 1fr;gap:16px;list-style:none;padding:0;margin:0}
+@media (max-width:640px){.cards2{grid-template-columns:1fr}}
+.terms{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.term{padding:24px;border-radius:var(--r);border:1px solid rgba(196,154,74,.3);background:rgba(255,255,255,.03)}
+.term strong{display:block;font:600 2rem/1 var(--f-display);color:var(--gold-soft);margin-bottom:10px}
+.term p{margin:0;color:var(--on-navy-muted);font-size:.95rem}
+@media (max-width:760px){.terms{grid-template-columns:1fr}}
+.team{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:640px}
+.mate{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 12px 18px}
+.mate img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:10px;display:block;margin-bottom:14px}
+.mate b{display:block;font-family:var(--f-display);font-size:1.2rem;padding-inline:6px}
+.mate span{display:block;font-size:.88rem;color:var(--muted);padding-inline:6px}
+.final{display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:center;padding:30px;border-radius:var(--r);background:var(--navy);color:var(--on-navy);margin-top:44px}
+.final h3{font-size:1.6rem;color:#f3ead8;margin-bottom:6px}
+.final p{margin:0;color:var(--on-navy-muted)}
+.final .ctas{display:flex;flex-wrap:wrap;gap:10px}
+</style>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="castle" viewBox="0 0 64 64">
+    <path d="M30.5 6v10" stroke="currentColor" stroke-width="1.6" fill="none"/>
+    <path d="M31.2 6.2l7 2.4-7 2.4z" fill="currentColor"/>
+    <path fill="currentColor" d="M25 16h3v2.5h2V16h3v2.5h2V16h3v10h-13z"/>
+    <path fill="currentColor" d="M14 27h3v2.5h2V27h3v2.5h2V27h2v-1h12v1h2v2.5h2V27h3v2.5h2V27h3v20H14z"/>
+    <path fill="var(--door,#14213a)" d="M28 47v-7a4 4 0 0 1 8 0v7z"/>
+    <rect x="30.2" y="19.5" width="3.6" height="4" rx="1.8" fill="var(--door,#14213a)"/>
+    <path d="M52 47c0-7 .6-12 2.4-17" stroke="currentColor" stroke-width="1.6" fill="none"/>
+    <path fill="currentColor" d="M54.4 30c-3-2.4-6.6-2.2-8.6-.4 3-.2 5.6.6 8.6.4zm0 0c2.6-2.8 6.2-3.2 8.4-1.8-3 .4-5.6.6-8.4 1.8zm0 0c-1-3.4-.2-6.4 1.6-8-.2 3-.8 5.2-1.6 8zm0 0c-2.6-.2-4.6 1.4-5.4 3.6 2-1.4 3.6-2.6 5.4-3.6zm0 0c2.4.6 4 2.4 4.4 4.6-1.6-1.8-3-3.2-4.4-4.6z"/>
+    <path d="M4 51c8-3 14-3 22 0s16 3 34-1" stroke="currentColor" stroke-width="1.6" fill="none"/>
+    <path d="M10 56c7-2 12-2 18 0s13 2 26-1" stroke="currentColor" stroke-width="1.2" fill="none" opacity=".6"/>
+  </symbol>
+</svg>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Sandcastles Stays home">
+      <svg style="color:#c49a4a;--door:#14213a"><use href="#castle"/></svg>
+      <span><b>SANDCASTLES</b><small>STAYS · PROPERTY MANAGEMENT</small></span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="/#stays">Stays</a>
+      <a href="/owners/" aria-current="page" style="color:#f3ead8">For owners</a>
+      <a href="/#about">About</a>
+      <a href="/shop/">Shop</a>
+      <a href="/#contact">Contact</a>
+      <a class="btn btn-gold" href="https://www.airbnb.co.in/users/show/153546484" target="_blank" rel="noopener">Book on Airbnb</a>
+    </nav>
+  </div>
+</header>
+<main>
+<div class="ow-hero">
+  <img class="bg" src="/img/hero-2.jpg" srcset="/img/hero-2-m.jpg 900w, /img/hero-2.jpg 1800w" sizes="100vw" alt="" style="object-position:60% 50%">
+  <div class="wrap">
+    <div class="eyebrow">Sandcastles Airbnb Management</div>
+    <h1>Your home, run as a <em>professional Airbnb.</em></h1>
+    <p>End-to-end short-term rental operations for homeowners anywhere in India. You keep full visibility and a ready vacation home for family and friends, and we handle everything else.</p>
+    <div class="ctas">
+      <a class="btn btn-gold" href="https://wa.me/918072770364?text=Hi%20Sandcastles%2C%20I%27d%20like%20to%20talk%20about%20listing%20my%20home." target="_blank" rel="noopener">Talk to us on WhatsApp</a>
+      <a class="btn btn-ghost" href="#earnings">See what you'd earn</a>
+    </div>
+  </div>
+</div>
+
+<section class="ow">
+  <div class="wrap">
+    <div class="eyebrow">The problem</div>
+    <h2>What usually goes wrong with <em>a second home</em></h2>
+    <p class="lead">Owners we speak to keep running into the same six problems.</p>
+    <ul class="cards3">
+      <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14.5 5.5a4 4 0 0 0-5.3 5.3L4 16l4 4 5.2-5.2a4 4 0 0 0 5.3-5.3l-2.6 2.6-2.4-.6-.6-2.4z"/></svg></span><div><h3>Nagging repairs</h3><p>Plumbing and electrical issues that nobody fixes quickly.</p></div></li>
+      <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 7l6 6 4-4 8 8M21 11v6h-6"/></svg></span><div><h3>Depreciation</h3><p>Empty homes age faster. Moisture, pests and neglect quietly cut their value.</p></div></li>
+      <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 5h10M7 9h10M7 5c5 0 6 2 6 4s-2 4-6 4l7 6"/></svg></span><div><h3>Unclear payments</h3><p>Unprofessional managers pay late, or pay inconsistent amounts.</p></div></li>
+      <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg></span><div><h3>Costly visits</h3><p>Extra cleaning and maintenance charges every time you visit your own vacation home.</p></div></li>
+      <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 10.6a2 2 0 0 0 2.8 2.8M9.9 5.1A9 9 0 0 1 21 12a9 9 0 0 1-1.7 2.6M6.2 6.2A9 9 0 0 0 3 12s3 7 9 7a9 9 0 0 0 4.2-1"/></svg></span><div><h3>No updates</h3><p>No real-time, honest picture of what is happening at the property.</p></div></li>
+      <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M12 4l-2 5 3 3-2 4 1 4"/></svg></span><div><h3>Cracks &amp; seepage</h3><p>Hidden damage that grows for months because nobody catches it in time.</p></div></li>
+    </ul>
+  </div>
+</section>
+
+<section class="ow dark">
+  <div class="wrap">
+    <div class="eyebrow">Our solution</div>
+    <h2>We manage your home <em>as its operator</em></h2>
+    <p class="lead">We run your home as a professionally managed Airbnb, with three promises.</p>
+    <div class="pillars">
+      <div><b>Revenue</b><h3>Transparent sharing</h3><p>A clear, agreed split, paid out the same way every month.</p></div>
+      <div><b>Reliability</b><h3>End-to-end service</h3><p>Listing, pricing, guests, housekeeping and repairs, all handled.</p></div>
+      <div><b>Visibility</b><h3>You see everything</h3><p>Bookings, messages, expenses and income, at any time.</p></div>
+    </div>
+    <div class="both">
+      <div><h3>A professionally run Airbnb</h3><p>Your home earns from guests on the nights you aren't using it.</p></div>
+      <div><h3>A ready vacation home</h3><p>Fully equipped and clean for whenever you, your family or friends visit.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="ow">
+  <div class="wrap">
+    <div class="eyebrow">Roles &amp; responsibilities</div>
+    <h2>Who does what</h2>
+    <p class="lead">A clear split, so you always know what is yours to decide and what we handle.</p>
+    <div class="roles">
+      <div class="role"><header><h3>Sandcastles</h3><span>Operator</span></header><ul>
+        <li>End-to-end Airbnb operations</li>
+        <li>Pricing, photography, guest handling and housekeeping</li>
+        <li>Utilities, daily maintenance and compliance</li>
+        <li>Periodic maintenance inspections</li>
+      </ul></div>
+      <div class="role"><header><h3>You</h3><span>Owner</span></header><ul>
+        <li>Security access to the home</li>
+        <li>Visibility of all bookings as a co-host</li>
+        <li>Approve any major spends</li>
+        <li>Enjoy a working vacation home</li>
+      </ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="ow alt" id="earnings">
+  <div class="wrap">
+    <div class="eyebrow">How you get paid</div>
+    <h2>Two simple ways <em>to share revenue</em></h2>
+    <p class="lead">Pick the model that suits you. Move the sliders to see an example month.</p>
+    <div class="calc">
+      <div>
+        <div class="models" role="group" aria-label="Revenue model">
+          <button type="button" id="m-profit" aria-pressed="true">Profit share · 70 / 30</button>
+          <button type="button" id="m-rev" aria-pressed="false">Revenue share · 60 / 40</button>
+        </div>
+        <p class="mdesc" id="mdesc"></p>
+        <div class="field"><label for="rev">Monthly booking revenue <output id="rev-o"></output></label><input type="range" id="rev" min="20000" max="400000" step="5000" value="100000"></div>
+        <div class="field" id="exp-f"><label for="exp">Monthly operating expenses <output id="exp-o"></output></label><input type="range" id="exp" min="0" max="150000" step="1000" value="20000"></div>
+      </div>
+      <div class="result" aria-live="polite">
+        <div class="row"><span>Booking revenue</span><b id="r-rev"></b></div>
+        <div class="row" id="r-exp-row"><span>Operating expenses</span><b id="r-exp"></b></div>
+        <div class="row" id="r-net-row"><span>Net profit</span><b id="r-net"></b></div>
+        <div class="big">
+          <div class="you"><small>You receive</small><strong id="r-own"></strong><em id="r-own-n"></em></div>
+          <div><small>Sandcastles</small><strong id="r-op"></strong><em id="r-op-n"></em></div>
+        </div>
+        <div class="bar" aria-hidden="true"><i class="o" id="b-o"></i><i class="p" id="b-p"></i><i class="e" id="b-e"></i></div>
+        <div class="legend"><span style="--c:#e6cf9d">You</span><span style="--c:#6e7a94">Sandcastles</span><span style="--c:#3a4762" id="lg-e">Expenses</span></div>
+        <p class="fine">Example figures only. In both models Airbnb splits each payout automatically, so it is transparent from day one.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ow">
+  <div class="wrap">
+    <div class="eyebrow">Operating expenses</div>
+    <h2>Every rupee, <em>on record</em></h2>
+    <p class="lead">Expenses are tracked in a shared settlement Google Sheet, and every receipt goes into a shared Google Drive.</p>
+    <ul class="exp">
+      <li><b>Maintenance</b><p>Cleaning, consumables and repairs.</p></li>
+      <li><b>Utilities</b><p>Electricity, internet, CAM charges and property tax.</p></li>
+      <li><b>Accounting</b><p>Tracked line by line in a shared settlement sheet.</p></li>
+      <li><b>Receipts</b><p>Every bill uploaded to a shared Google Drive.</p></li>
+    </ul>
+  </div>
+</section>
+
+<section class="ow alt">
+  <div class="wrap">
+    <div class="eyebrow">Owner visibility &amp; control</div>
+    <h2>Always know what's happening <em>in your home</em></h2>
+    <p class="lead">You can call or text us any time, and you can check things yourself whenever you like.</p>
+    <ul class="cards2">
+      <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 7h12v10H3zM15 10l6-3v10l-6-3"/></svg></span><div><h3>Camera access</h3><p>Guest movement detection at the entrance, 24×7.</p></div></li>
+      <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg></span><div><h3>Co-host access</h3><p>Real-time access to every guest message and booking detail on Airbnb.</p></div></li>
+      <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M9 13l2 2 4-4"/></svg></span><div><h3>Right to audit</h3><p>A shared Drive with logs, inventory and every bill.</p></div></li>
+      <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 8"/></svg></span><div><h3>Photo updates</h3><p>Any major service or repair is shared with photos on WhatsApp.</p></div></li>
+    </ul>
+  </div>
+</section>
+
+<section class="ow dark">
+  <div class="wrap">
+    <div class="eyebrow">Exit clarity</div>
+    <h2>Designed for <em>long-term trust</em></h2>
+    <p class="lead">Simple terms, agreed upfront.</p>
+    <div class="terms">
+      <div class="term"><strong>1 year</strong><p>Lock-in period, so we can invest properly in setting up your home.</p></div>
+      <div class="term"><strong>30 days</strong><p>Notice period, the same for both sides.</p></div>
+      <div class="term"><strong>Clean</strong><p>Handover with full reconciliation of income, expenses and inventory.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="ow">
+  <div class="wrap">
+    <div class="eyebrow">The team</div>
+    <h2>Who you'll work with</h2>
+    <p class="lead">5 years of hosting, 32 homes and 936 guest reviews across Goa, Bengaluru, Vadodara and Thrissur.</p>
+    <div class="team">
+      <div class="mate"><img src="/img/rohit.jpg" alt="Rohit Aggarwal" width="640" height="800"><b>Rohit Aggarwal</b><span>Automotive Engineer · Operations &amp; Owners</span></div>
+      <div class="mate"><img src="/img/deepika.jpg" alt="Deepika Shivaramaiah" width="640" height="800"><b>Deepika Shivaramaiah</b><span>Interior Designer &amp; Civil Engineer · Guests &amp; Homes</span></div>
+    </div>
+    <div class="final">
+      <div><h3>Have a home that sits empty?</h3><p>Call or WhatsApp +91 80727 70364, or email aggrohit.aggarwal@gmail.com</p></div>
+      <div class="ctas">
+        <a class="btn btn-gold" href="https://wa.me/918072770364?text=Hi%20Sandcastles%2C%20I%27d%20like%20to%20talk%20about%20listing%20my%20home." target="_blank" rel="noopener">Talk to us on WhatsApp</a>
+        <a class="btn btn-ghost" href="/#stays">See our homes</a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+<footer>
+  <div class="wrap">
+    <span class="brand"><svg style="color:#c49a4a;--door:#14213a;width:28px;height:28px"><use href="#castle"/></svg><b>SANDCASTLES</b></span>
+    <span>© 2026 Sandcastles Stays · Airbnb property management across India</span>
+  </div>
+</footer>
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+  let model='profit';
+  function upd(){
+    const rev=+$('rev').value, exp=+$('exp').value;
+    $('rev-o').textContent=fmt(rev); $('exp-o').textContent=fmt(exp);
+    $('r-rev').textContent=fmt(rev);
+    let own,op,e;
+    if(model==='profit'){
+      const net=Math.max(0,rev-exp); own=net*.7; op=net*.3; e=Math.min(exp,rev);
+      $('mdesc').innerHTML='<b>Profit share.</b> Expenses come off the top first. You get <b>70%</b> of the net profit and we get 30%.';
+      $('exp-f').classList.remove('hidden'); $('r-exp-row').hidden=false; $('r-net-row').hidden=false;
+      $('r-exp').textContent='− '+fmt(e); $('r-net').textContent=fmt(net);
+      $('r-own-n').textContent='70% of net profit'; $('r-op-n').textContent='30% of net profit';
+      $('lg-e').hidden=false;
+    } else {
+      own=rev*.6; op=rev*.4; e=0;
+      $('mdesc').innerHTML='<b>Revenue share.</b> You get <b>60%</b> of booking revenue. We take 40% and pay all operating expenses from it.';
+      $('exp-f').classList.add('hidden'); $('r-exp-row').hidden=true; $('r-net-row').hidden=true;
+      $('r-own-n').textContent='60% of revenue'; $('r-op-n').textContent='40% of revenue, covers expenses';
+      $('lg-e').hidden=true;
+    }
+    $('r-own').textContent=fmt(own); $('r-op').textContent=fmt(op);
+    const t=rev||1; $('b-o').style.width=(own/t*100)+'%'; $('b-p').style.width=(op/t*100)+'%'; $('b-e').style.width=(e/t*100)+'%';
+  }
+  $('m-profit').onclick=()=>{model='profit';$('m-profit').setAttribute('aria-pressed','true');$('m-rev').setAttribute('aria-pressed','false');upd();};
+  $('m-rev').onclick=()=>{model='rev';$('m-rev').setAttribute('aria-pressed','true');$('m-profit').setAttribute('aria-pressed','false');upd();};
+  $('rev').oninput=upd; $('exp').oninput=upd; upd();
+})();
+</script>
+</body>
+</html>
