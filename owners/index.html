@@ -230,11 +230,6 @@ footer .brand b{font-size:.9rem}
 .role li::before{content:"";position:absolute;left:2px;top:17px;width:12px;height:7px;border-left:2px solid var(--gold);border-bottom:2px solid var(--gold);transform:rotate(-45deg)}
 @media (max-width:700px){.roles{grid-template-columns:1fr}}
 .calc{display:grid;grid-template-columns:.95fr 1.05fr;gap:28px;align-items:start}
-.models{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
-.models button{font:600 .9rem/1 var(--f-body);padding:.8em 1.1em;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--fg);cursor:pointer}
-.models button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#f3ead8}
-.mdesc{margin:0 0 22px;color:var(--muted);font-size:.95rem}
-.mdesc b{color:var(--fg)}
 .field{margin-bottom:18px}
 .field label{display:flex;justify-content:space-between;font-weight:600;font-size:.9rem;margin-bottom:8px}
 .field output{font-variant-numeric:tabular-nums;color:var(--gold)}
@@ -272,13 +267,20 @@ footer .brand b{font-size:.9rem}
 @media (max-width:760px){.terms{grid-template-columns:1fr}}
 .team{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:640px}
 .mate{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 12px 18px}
-.mate img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:10px;display:block;margin-bottom:14px}
+.mate img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:10px;display:block;margin-bottom:14px}
 .mate b{display:block;font-family:var(--f-display);font-size:1.2rem;padding-inline:6px}
 .mate span{display:block;font-size:.88rem;color:var(--muted);padding-inline:6px}
 .final{display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:center;padding:30px;border-radius:var(--r);background:var(--navy);color:var(--on-navy);margin-top:44px}
 .final h3{font-size:1.6rem;color:#f3ead8;margin-bottom:6px}
 .final p{margin:0;color:var(--on-navy-muted)}
 .final .ctas{display:flex;flex-wrap:wrap;gap:10px}
+@media (max-width:600px){
+  .team{grid-template-columns:1fr;max-width:none}
+  .mate{display:grid;grid-template-columns:96px 1fr;column-gap:16px;align-items:center;padding:12px}
+  .mate img{width:96px;grid-row:span 2;margin:0}
+  .mate b,.mate span{padding-inline:0}
+  .mate b{align-self:end}.mate span{align-self:start}
+}
 </style>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="castle" viewBox="0 0 64 64">
@@ -346,7 +348,7 @@ footer .brand b{font-size:.9rem}
     <h2>We manage your home <em>as its operator</em></h2>
     <p class="lead">We run your home as a professionally managed Airbnb, with three promises.</p>
     <div class="pillars">
-      <div><b>Revenue</b><h3>Transparent sharing</h3><p>A clear, agreed split, paid out the same way every month.</p></div>
+      <div><b>Revenue</b><h3>Transparent sharing</h3><p>70% of net profit goes to you, settled the same way every month.</p></div>
       <div><b>Reliability</b><h3>End-to-end service</h3><p>Listing, pricing, guests, housekeeping and repairs, all handled.</p></div>
       <div><b>Visibility</b><h3>You see everything</h3><p>Bookings, messages, expenses and income, at any time.</p></div>
     </div>
@@ -382,15 +384,10 @@ footer .brand b{font-size:.9rem}
 <section class="ow alt" id="earnings">
   <div class="wrap">
     <div class="eyebrow">How you get paid</div>
-    <h2>Two simple ways <em>to share revenue</em></h2>
-    <p class="lead">Pick the model that suits you. Move the sliders to see an example month.</p>
+    <h2>A simple <em>70 / 30 profit share</em></h2>
+    <p class="lead">Expenses come off the top. Whatever is left is net profit: <b>70% goes to you</b> and 30% to us. Move the sliders to try your own numbers.</p>
     <div class="calc">
       <div>
-        <div class="models" role="group" aria-label="Revenue model">
-          <button type="button" id="m-profit" aria-pressed="true">Profit share · 70 / 30</button>
-          <button type="button" id="m-rev" aria-pressed="false">Revenue share · 60 / 40</button>
-        </div>
-        <p class="mdesc" id="mdesc"></p>
         <div class="field"><label for="rev">Monthly booking revenue <output id="rev-o"></output></label><input type="range" id="rev" min="20000" max="400000" step="5000" value="100000"></div>
         <div class="field" id="exp-f"><label for="exp">Monthly operating expenses <output id="exp-o"></output></label><input type="range" id="exp" min="0" max="150000" step="1000" value="20000"></div>
       </div>
@@ -399,12 +396,12 @@ footer .brand b{font-size:.9rem}
         <div class="row" id="r-exp-row"><span>Operating expenses</span><b id="r-exp"></b></div>
         <div class="row" id="r-net-row"><span>Net profit</span><b id="r-net"></b></div>
         <div class="big">
-          <div class="you"><small>You receive</small><strong id="r-own"></strong><em id="r-own-n"></em></div>
-          <div><small>Sandcastles</small><strong id="r-op"></strong><em id="r-op-n"></em></div>
+          <div class="you"><small>You receive</small><strong id="r-own"></strong><em>70% of net profit</em></div>
+          <div><small>Sandcastles</small><strong id="r-op"></strong><em>30% of net profit</em></div>
         </div>
         <div class="bar" aria-hidden="true"><i class="o" id="b-o"></i><i class="p" id="b-p"></i><i class="e" id="b-e"></i></div>
-        <div class="legend"><span style="--c:#e6cf9d">You</span><span style="--c:#6e7a94">Sandcastles</span><span style="--c:#3a4762" id="lg-e">Expenses</span></div>
-        <p class="fine">Example figures only. In both models Airbnb splits each payout automatically, so it is transparent from day one.</p>
+        <div class="legend"><span style="--c:#e6cf9d">You</span><span style="--c:#6e7a94">Sandcastles</span><span style="--c:#3a4762">Expenses</span></div>
+        <p class="fine">Example figures only. Every booking, expense and receipt is shared with you, so you can check the numbers yourself.</p>
       </div>
     </div>
   </div>
@@ -480,31 +477,13 @@ footer .brand b{font-size:.9rem}
 (function(){
   const $=id=>document.getElementById(id);
   const fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
-  let model='profit';
   function upd(){
-    const rev=+$('rev').value, exp=+$('exp').value;
-    $('rev-o').textContent=fmt(rev); $('exp-o').textContent=fmt(exp);
-    $('r-rev').textContent=fmt(rev);
-    let own,op,e;
-    if(model==='profit'){
-      const net=Math.max(0,rev-exp); own=net*.7; op=net*.3; e=Math.min(exp,rev);
-      $('mdesc').innerHTML='<b>Profit share.</b> Expenses come off the top first. You get <b>70%</b> of the net profit and we get 30%.';
-      $('exp-f').classList.remove('hidden'); $('r-exp-row').hidden=false; $('r-net-row').hidden=false;
-      $('r-exp').textContent='− '+fmt(e); $('r-net').textContent=fmt(net);
-      $('r-own-n').textContent='70% of net profit'; $('r-op-n').textContent='30% of net profit';
-      $('lg-e').hidden=false;
-    } else {
-      own=rev*.6; op=rev*.4; e=0;
-      $('mdesc').innerHTML='<b>Revenue share.</b> You get <b>60%</b> of booking revenue. We take 40% and pay all operating expenses from it.';
-      $('exp-f').classList.add('hidden'); $('r-exp-row').hidden=true; $('r-net-row').hidden=true;
-      $('r-own-n').textContent='60% of revenue'; $('r-op-n').textContent='40% of revenue, covers expenses';
-      $('lg-e').hidden=true;
-    }
+    const rev=+$('rev').value, exp=Math.min(+$('exp').value, rev), net=rev-exp, own=net*.7, op=net*.3;
+    $('rev-o').textContent=fmt(rev); $('exp-o').textContent=fmt(+$('exp').value);
+    $('r-rev').textContent=fmt(rev); $('r-exp').textContent='− '+fmt(exp); $('r-net').textContent=fmt(net);
     $('r-own').textContent=fmt(own); $('r-op').textContent=fmt(op);
-    const t=rev||1; $('b-o').style.width=(own/t*100)+'%'; $('b-p').style.width=(op/t*100)+'%'; $('b-e').style.width=(e/t*100)+'%';
+    const t=rev||1; $('b-o').style.width=(own/t*100)+'%'; $('b-p').style.width=(op/t*100)+'%'; $('b-e').style.width=(exp/t*100)+'%';
   }
-  $('m-profit').onclick=()=>{model='profit';$('m-profit').setAttribute('aria-pressed','true');$('m-rev').setAttribute('aria-pressed','false');upd();};
-  $('m-rev').onclick=()=>{model='rev';$('m-rev').setAttribute('aria-pressed','true');$('m-profit').setAttribute('aria-pressed','false');upd();};
   $('rev').oninput=upd; $('exp').oninput=upd; upd();
 })();
 </script>

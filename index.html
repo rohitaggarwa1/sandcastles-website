@@ -178,7 +178,14 @@ section{padding-block:84px}
 .founder p{font-size:.9rem;margin:10px 0 0}
 .founder a{font-size:.85rem;font-weight:600;color:var(--gold);text-decoration:none;display:inline-block;margin-top:10px}
 @media (max-width:860px){.about .wrap{grid-template-columns:1fr;gap:32px}}
-@media (max-width:440px){.founders{grid-template-columns:1fr}}
+@media (max-width:600px){
+  .founders{grid-template-columns:1fr}
+  .founder{display:grid;grid-template-columns:104px 1fr;column-gap:16px;row-gap:2px;align-items:start;padding:12px}
+  .founder .ph{width:104px;grid-row:span 4;margin:0}
+  .founder > :not(.ph){padding-inline:0;grid-column:2}
+  .founder p{margin-top:6px;font-size:.88rem}
+  .founder a{margin-top:6px}
+}
 
 /* contact */
 .contact{border-top:1px solid var(--line)}
