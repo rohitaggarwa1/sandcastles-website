@@ -8,7 +8,7 @@
 <meta property="og:image" content="/img/hero-1.jpg">
 <title>Sandcastles Shop</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="Bedding, TVs, ACs, storage and cleaning supplies we use across our Airbnb homes, with links to buy them on Amazon.">
+<meta name="description" content="Bedding, TVs, storage and cleaning supplies we use across our Airbnb homes, with links to buy them on Amazon.">
 <link rel="canonical" href="https://sandcastlesstays.com/shop/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -193,6 +193,11 @@ footer .soc a{color:#e6cf9d;text-decoration:none}footer .brand b{font-size:.9rem
 @media (max-width:800px){.shop-hero .wrap{grid-template-columns:1fr}}
 .prods{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:22px}
 .prod[hidden]{display:none}
+.prod .pp{position:relative;aspect-ratio:16/9;max-width:100%;overflow:hidden;background:var(--line)}
+.prod .pp img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}
+.prod:hover .pp img{transform:scale(1.04)}
+.prod .pp span{position:absolute;right:10px;bottom:10px;background:rgba(20,33,58,.82);color:#f3ead8;font:500 .68rem/1 var(--f-body);letter-spacing:.06em;padding:.5em .7em;border-radius:6px}
+
 .prod{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;text-decoration:none;color:inherit;transition:transform .25s, box-shadow .25s}
 .prod:hover{transform:translateY(-3px);box-shadow:0 14px 30px -18px rgba(20,33,58,.45)}
 .prod .band{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--navy);color:#e6cf9d}
@@ -241,109 +246,107 @@ footer .soc a{color:#e6cf9d;text-decoration:none}footer .brand b{font-size:.9rem
     <div>
       <div class="eyebrow">Sandcastles Shop</div>
       <h1>What we use <em>in our homes.</em></h1>
-      <p>The bedding, TVs, ACs, storage and cleaning supplies we buy for our Airbnb homes. Useful if you're setting up a rental of your own, or if you liked something during your stay.</p>
+      <p>The bedding, TVs, storage and cleaning supplies we buy for our Airbnb homes. Useful if you're setting up a rental of your own, or if you liked something during your stay.</p>
     </div>
     <p class="note">We add products slowly, and only ones we've ordered for our own properties.</p>
   </div>
 </div>
 <section>
   <div class="wrap">
-    <div class="filters" role="group" aria-label="Filter by category" id="f"><button type="button" class="chip" data-c="All" aria-pressed="true">All<span>23</span></button><button type="button" class="chip" data-c="Bedroom" aria-pressed="false">Bedroom<span>1</span></button><button type="button" class="chip" data-c="Living room" aria-pressed="false">Living room<span>2</span></button><button type="button" class="chip" data-c="TV &amp; media" aria-pressed="false">TV &amp; media<span>5</span></button><button type="button" class="chip" data-c="Cooling" aria-pressed="false">Cooling<span>4</span></button><button type="button" class="chip" data-c="Storage" aria-pressed="false">Storage<span>3</span></button><button type="button" class="chip" data-c="Cleaning" aria-pressed="false">Cleaning<span>8</span></button></div>
+    <div class="filters" role="group" aria-label="Filter by category" id="f"><button type="button" class="chip" data-c="All" aria-pressed="true">All<span>18</span></button><button type="button" class="chip" data-c="Bedroom" aria-pressed="false">Bedroom<span>1</span></button><button type="button" class="chip" data-c="Living room" aria-pressed="false">Living room<span>2</span></button><button type="button" class="chip" data-c="TV &amp; media" aria-pressed="false">TV &amp; media<span>3</span></button><button type="button" class="chip" data-c="Storage" aria-pressed="false">Storage<span>4</span></button><button type="button" class="chip" data-c="Cleaning" aria-pressed="false">Cleaning<span>8</span></button></div>
     <div class="prods" id="g" style="margin-top:20px">
       <a class="prod" data-cat="Bedroom" href="https://www.amazon.in/dp/B0DCL4JJRD?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
+        <div class="pp"><img src="/img/14.jpg" alt="" loading="lazy" width="720" height="406"><span>In our homes</span></div>
         <div class="band"><span>Bedroom</span><svg viewBox="0 0 24 24"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6M3 18h18M3 21v-3M21 21v-3M6 10V7a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3M12 10V7a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg></div>
         <div class="b"><h3>300TC pure cotton king bedsheet</h3><div class="spec">DECOR2ADMIRE · King size, with 2 pillow covers</div><p>Pure cotton breathes better than glace or polycotton in humid weather, and a fine stripe looks crisp in photos while hiding small marks between washes.</p><span class="go">View on Amazon ↗</span></div>
       </a>
       <a class="prod" data-cat="Living room" href="https://www.amazon.in/dp/B0GMQXR8HP?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
+        <div class="pp"><img src="/img/10.jpg" alt="" loading="lazy" width="720" height="406"><span>In our homes</span></div>
         <div class="band"><span>Living room</span><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="3"/><path d="M8 9l8 6M16 9l-8 6"/></svg></div>
         <div class="b"><h3>Jute cushion covers, yellow and grey</h3><div class="spec">STITCHNEST · Set of 2 · 16 × 16 in</div><p>Textured jute adds warmth to a plain sofa for very little money, and the ikat-style print hides everyday wear. Swap covers each season instead of buying new cushions.</p><span class="go">View on Amazon ↗</span></div>
       </a>
       <a class="prod" data-cat="Living room" href="https://www.amazon.in/dp/B08F2H1MKP?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
+        <div class="pp"><img src="/img/07.jpg" alt="" loading="lazy" width="720" height="406"><span>In our homes</span></div>
         <div class="band"><span>Living room</span><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="3"/><path d="M8 9l8 6M16 9l-8 6"/></svg></div>
         <div class="b"><h3>Microfiber cushion fillers</h3><div class="spec">JDX · Set of 5 · 16 × 16 in, white</div><p>Covers only look good on a full, springy filler. These fit standard 16-inch covers, so one set works across every sofa and bed.</p><span class="go">View on Amazon ↗</span></div>
       </a>
       <a class="prod" data-cat="TV &amp; media" href="https://www.amazon.in/dp/B0G72XLWFN?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
+        <div class="pp"><img src="/img/19.jpg" alt="" loading="lazy" width="720" height="406"><span>In our homes</span></div>
         <div class="band"><span>TV &amp; media</span><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg></div>
         <div class="b"><h3>Solid wood floating TV unit</h3><div class="spec">X went · Wall-mounted, natural finish</div><p>A floating unit keeps the floor clear, so rooms photograph bigger and cleaning underneath takes seconds. Solid wood also survives guests better than laminate.</p><span class="go">View on Amazon ↗</span></div>
       </a>
       <a class="prod" data-cat="TV &amp; media" href="https://www.amazon.in/dp/B0CJC2W6D5?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
+        <div class="pp"><img src="/img/08.jpg" alt="" loading="lazy" width="720" height="406"><span>In our homes</span></div>
         <div class="band"><span>TV &amp; media</span><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg></div>
         <div class="b"><h3>Wall-mount TV entertainment unit</h3><div class="spec">BLUEWUD Darien · Engineered wood, set-top box shelf</div><p>A tidy home for the set-top box, router and remotes, so cables stay hidden and guests can find everything on the first try.</p><span class="go">View on Amazon ↗</span></div>
       </a>
-      <a class="prod" data-cat="TV &amp; media" href="https://www.amazon.in/dp/B0F2FPC11M?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
+      <a class="prod" data-cat="TV &amp; media" href="https://www.amazon.in/dp/B0GK9D99SG?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
+        <div class="pp"><img src="/img/04.jpg" alt="" loading="lazy" width="720" height="406"><span>In our homes</span></div>
         <div class="band"><span>TV &amp; media</span><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg></div>
         <div class="b"><h3>50-inch 4K QLED Google TV</h3><div class="spec">VW Pro Series · VW50GQ1</div><p>Google TV means guests can sign in to their own Netflix or YouTube without calling you. A 50-inch screen suits most 2 BHK living rooms.</p><span class="go">View on Amazon ↗</span></div>
       </a>
-      <a class="prod" data-cat="TV &amp; media" href="https://www.amazon.in/dp/B0DRV7JFMS?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
-        <div class="band"><span>TV &amp; media</span><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg></div>
-        <div class="b"><h3>55-inch 4K QLED Google TV</h3><div class="spec">VW Pro Series · VW55GQ1</div><p>The bigger option for larger living rooms and 3 BHKs, with the same easy guest sign-in as the 50-inch.</p><span class="go">View on Amazon ↗</span></div>
-      </a>
-      <a class="prod" data-cat="TV &amp; media" href="https://www.amazon.in/dp/B0CYQ69V7N?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
-        <div class="band"><span>TV &amp; media</span><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg></div>
-        <div class="b"><h3>Heavy-duty TV wall mount</h3><div class="spec">Robustt · For 42–55 inch TVs</div><p>Wall-mounting keeps the TV out of reach of children and off the furniture, and it frees up the TV unit for decor.</p><span class="go">View on Amazon ↗</span></div>
-      </a>
-      <a class="prod" data-cat="Cooling" href="https://www.amazon.in/dp/B0GHQVNMKQ?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
-        <div class="band"><span>Cooling</span><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="7" rx="1.5"/><path d="M6 9h12M7 15c0 2-1 3-1 4M12 15v4M17 15c0 2 1 3 1 4"/></svg></div>
-        <div class="b"><h3>1.5 ton Wi-Fi inverter split AC</h3><div class="spec">Panasonic · 3 star, smart Wi-Fi</div><p>The size we use for living rooms and larger bedrooms. Wi-Fi control lets you switch it off remotely when a guest forgets.</p><span class="go">View on Amazon ↗</span></div>
-      </a>
-      <a class="prod" data-cat="Cooling" href="https://www.amazon.in/dp/B0GHR4P5KV?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
-        <div class="band"><span>Cooling</span><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="7" rx="1.5"/><path d="M6 9h12M7 15c0 2-1 3-1 4M12 15v4M17 15c0 2 1 3 1 4"/></svg></div>
-        <div class="b"><h3>1 ton Wi-Fi inverter split AC</h3><div class="spec">Panasonic · 3 star, smart Wi-Fi</div><p>Right-sized for standard bedrooms, with the same remote control from your phone. Inverter models keep electricity bills down between stays.</p><span class="go">View on Amazon ↗</span></div>
-      </a>
-      <a class="prod" data-cat="Cooling" href="https://www.amazon.in/dp/B0CRF441PK?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
-        <div class="band"><span>Cooling</span><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="7" rx="1.5"/><path d="M6 9h12M7 15c0 2-1 3-1 4M12 15v4M17 15c0 2 1 3 1 4"/></svg></div>
-        <div class="b"><h3>1.5 ton inverter split AC</h3><div class="spec">Cruise VarioQool · 3 star</div><p>A budget-friendly alternative for bigger rooms, with an inverter compressor for lower running costs.</p><span class="go">View on Amazon ↗</span></div>
-      </a>
-      <a class="prod" data-cat="Cooling" href="https://www.amazon.in/dp/B09RGBRCQL?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
-        <div class="band"><span>Cooling</span><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="7" rx="1.5"/><path d="M6 9h12M7 15c0 2-1 3-1 4M12 15v4M17 15c0 2 1 3 1 4"/></svg></div>
+      <a class="prod" data-cat="Storage" href="https://www.amazon.in/dp/B09RGBRCQL?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
+        <div class="pp"><img src="/img/16.jpg" alt="" loading="lazy" width="720" height="406"><span>In our homes</span></div>
+        <div class="band"><span>Storage</span><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="7" rx="1"/><rect x="4" y="13" width="16" height="7" rx="1"/><path d="M10 7.5h4M10 16.5h4"/></svg></div>
         <div class="b"><h3>Wall-mounted remote holder</h3><div class="spec">Primelife · For AC and TV remotes</div><p>Remotes go missing more than anything else in a rental. A holder next to each AC means the next guest always finds one.</p><span class="go">View on Amazon ↗</span></div>
       </a>
       <a class="prod" data-cat="Storage" href="https://www.amazon.in/dp/B07BZ1XZ77?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
+        <div class="pp"><img src="/img/15.jpg" alt="" loading="lazy" width="720" height="406"><span>In our homes</span></div>
         <div class="band"><span>Storage</span><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="7" rx="1"/><rect x="4" y="13" width="16" height="7" rx="1"/><path d="M10 7.5h4M10 16.5h4"/></svg></div>
         <div class="b"><h3>Under-bed storage bags</h3><div class="spec">Storite · Pack of 4, moisture-proof</div><p>Spare linen and owner belongings stay dust-free and out of sight under the bed, which matters a lot in Goa's monsoon.</p><span class="go">View on Amazon ↗</span></div>
       </a>
       <a class="prod" data-cat="Storage" href="https://www.amazon.in/dp/B0DYL4TTRF?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
+        <div class="pp"><img src="/img/25.jpg" alt="" loading="lazy" width="720" height="406"><span>In our homes</span></div>
         <div class="band"><span>Storage</span><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="7" rx="1"/><rect x="4" y="13" width="16" height="7" rx="1"/><path d="M10 7.5h4M10 16.5h4"/></svg></div>
         <div class="b"><h3>Self-adhesive bathroom organiser</h3><div class="spec">Stainless steel · No drilling</div><p>Gives guests somewhere to put their toiletries without drilling into tiles. Easy to add to any bathroom.</p><span class="go">View on Amazon ↗</span></div>
       </a>
       <a class="prod" data-cat="Storage" href="https://www.amazon.in/dp/B07R5YGCDJ?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
+        <div class="pp"><img src="/img/11.jpg" alt="" loading="lazy" width="720" height="406"><span>In our homes</span></div>
         <div class="band"><span>Storage</span><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="7" rx="1"/><rect x="4" y="13" width="16" height="7" rx="1"/><path d="M10 7.5h4M10 16.5h4"/></svg></div>
         <div class="b"><h3>Combination key safe</h3><div class="spec">DOCOSS · Wall-mounted, metal</div><p>The simplest way to offer self check-in. Share the code with each guest and change it between stays.</p><span class="go">View on Amazon ↗</span></div>
       </a>
       <a class="prod" data-cat="Cleaning" href="https://www.amazon.in/dp/B07ZKQ8HXS?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
+        <div class="pp"><img src="/img/29.jpg" alt="" loading="lazy" width="720" height="406"><span>In our homes</span></div>
         <div class="band"><span>Cleaning</span><svg viewBox="0 0 24 24"><path d="M9 3h5v4H9zM8 7h7l1 3v10a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V10z"/><path d="M14 3h3l2 2"/></svg></div>
         <div class="b"><h3>Disinfectant floor and surface cleaner, 5 L</h3><div class="spec">Amazon Brand Presto! · Citrus</div><p>A 5-litre can goes a long way between guest turnovers and works out far cheaper than small bottles. The citrus smell reads as "freshly cleaned" when guests walk in.</p><span class="go">View on Amazon ↗</span></div>
       </a>
       <a class="prod" data-cat="Cleaning" href="https://www.amazon.in/dp/B0842CPRCZ?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
+        <div class="pp"><img src="/img/31.jpg" alt="" loading="lazy" width="720" height="406"><span>In our homes</span></div>
         <div class="band"><span>Cleaning</span><svg viewBox="0 0 24 24"><path d="M9 3h5v4H9zM8 7h7l1 3v10a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V10z"/><path d="M14 3h3l2 2"/></svg></div>
         <div class="b"><h3>Disinfectant toilet cleaner, 5 L</h3><div class="spec">Amazon Brand Presto! · Original</div><p>Buying in 5-litre cans keeps every home stocked and cuts the cost per clean.</p><span class="go">View on Amazon ↗</span></div>
       </a>
       <a class="prod" data-cat="Cleaning" href="https://www.amazon.in/dp/B0G93W3P3S?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
+        <div class="pp"><img src="/img/00.jpg" alt="" loading="lazy" width="720" height="406"><span>In our homes</span></div>
         <div class="band"><span>Cleaning</span><svg viewBox="0 0 24 24"><path d="M9 3h5v4H9zM8 7h7l1 3v10a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V10z"/><path d="M14 3h3l2 2"/></svg></div>
         <div class="b"><h3>Glass cleaner, 5 L</h3><div class="spec">SafeSpaze · Multi-purpose</div><p>Streak-free mirrors and windows make a big difference in listing photos and first impressions.</p><span class="go">View on Amazon ↗</span></div>
       </a>
       <a class="prod" data-cat="Cleaning" href="https://www.amazon.in/dp/B07LDKFM2Y?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
+        <div class="pp"><img src="/img/12.jpg" alt="" loading="lazy" width="720" height="406"><span>In our homes</span></div>
         <div class="band"><span>Cleaning</span><svg viewBox="0 0 24 24"><path d="M9 3h5v4H9zM8 7h7l1 3v10a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V10z"/><path d="M14 3h3l2 2"/></svg></div>
         <div class="b"><h3>Twin-bucket spin mop</h3><div class="spec">Scotch-Brite · Easy wring and rinse</div><p>Separate rinse and wring buckets keep the mop water cleaner, so floors dry faster between check-out and check-in.</p><span class="go">View on Amazon ↗</span></div>
       </a>
       <a class="prod" data-cat="Cleaning" href="https://www.amazon.in/dp/B00NBM24PS?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
+        <div class="pp"><img src="/img/18.jpg" alt="" loading="lazy" width="720" height="406"><span>In our homes</span></div>
         <div class="band"><span>Cleaning</span><svg viewBox="0 0 24 24"><path d="M9 3h5v4H9zM8 7h7l1 3v10a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V10z"/><path d="M14 3h3l2 2"/></svg></div>
         <div class="b"><h3>Bathroom tile scrubber brush</h3><div class="spec">Scotch-Brite · For tiles and corners</div><p>Gets into grout and corners that a mop misses. Clean bathrooms are what guests notice most in reviews.</p><span class="go">View on Amazon ↗</span></div>
       </a>
       <a class="prod" data-cat="Cleaning" href="https://www.amazon.in/dp/B073YC6FPV?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
+        <div class="pp"><img src="/img/24.jpg" alt="" loading="lazy" width="720" height="406"><span>In our homes</span></div>
         <div class="band"><span>Cleaning</span><svg viewBox="0 0 24 24"><path d="M9 3h5v4H9zM8 7h7l1 3v10a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V10z"/><path d="M14 3h3l2 2"/></svg></div>
         <div class="b"><h3>Garbage bags, 180 pieces</h3><div class="spec">Ezee · Small, for dustbins</div><p>A big pack covers every dustbin in a home for months, so housekeeping never runs out mid-turnover.</p><span class="go">View on Amazon ↗</span></div>
       </a>
       <a class="prod" data-cat="Cleaning" href="https://www.amazon.in/dp/B07ZBGRP82?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
+        <div class="pp"><img src="/img/13.jpg" alt="" loading="lazy" width="720" height="406"><span>In our homes</span></div>
         <div class="band"><span>Cleaning</span><svg viewBox="0 0 24 24"><path d="M9 3h5v4H9zM8 7h7l1 3v10a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V10z"/><path d="M14 3h3l2 2"/></svg></div>
         <div class="b"><h3>Drain cleaner powder</h3><div class="spec">Kiwi Dranex · 375 g</div><p>A slow bathroom drain is one of the most common guest complaints. Keeping a pack with the cleaning kit lets housekeeping fix it the same day instead of waiting for a plumber.</p><span class="go">View on Amazon ↗</span></div>
       </a>
       <a class="prod" data-cat="Cleaning" href="https://www.amazon.in/dp/B0FL2458CF?tag=sandcastlesst-21" target="_blank" rel="sponsored nofollow noopener">
+        <div class="pp"><img src="/img/26.jpg" alt="" loading="lazy" width="720" height="406"><span>In our homes</span></div>
         <div class="band"><span>Cleaning</span><svg viewBox="0 0 24 24"><path d="M9 3h5v4H9zM8 7h7l1 3v10a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V10z"/><path d="M14 3h3l2 2"/></svg></div>
         <div class="b"><h3>Robot vacuum and mop</h3><div class="spec">ECOVACS DEEBOT N30 · 2 in 1</div><p>Runs on a schedule between stays, so floors stay clean even on days housekeeping isn't scheduled.</p><span class="go">View on Amazon ↗</span></div>
       </a>
     </div>
-    <p class="disc">As an Amazon Associate, Sandcastles Stays earns from qualifying purchases. Prices and availability are shown on Amazon and may change.</p>
+    <p class="disc">As an Amazon Associate, Sandcastles Stays earns from qualifying purchases. Prices and availability are shown on Amazon and may change. Photos are from our own homes, not product photos.</p>
   </div>
 </section>
 </main>
