@@ -6,6 +6,14 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Owner Dashboard · Sandcastles</title>
 <meta name="description" content="Earnings, expenses and occupancy for homes managed by Sandcastles Stays.">
+<link rel="manifest" href="/dashboard/manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="/dashboard/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/dashboard/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sandcastles">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#14213a">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Marcellus&family=Manrope:wght@400;500;600;700&display=swap">
@@ -103,6 +111,11 @@ section{display:grid;gap:12px}
 .btn{display:inline-flex;justify-content:center;align-items:center;gap:8px;background:var(--navy);color:var(--on-navy);border:0;border-radius:10px;padding:12px 16px;font-weight:700;cursor:pointer;text-decoration:none}
 .btn.gold{background:var(--gold);color:var(--navy)}
 .foot{font-size:12.5px;color:var(--muted);text-align:center}
+.install{display:flex;gap:12px;align-items:flex-start}
+.install img{width:44px;height:44px;border-radius:10px;flex:none}
+.install b{display:block}
+.install .btn{margin-top:10px;padding:9px 14px}
+.install .x{margin-left:auto;background:none;border:0;color:var(--muted);font-size:20px;line-height:1;cursor:pointer;padding:0 2px}
 
 /* Sign-in */
 .signin{min-height:80vh;display:grid;align-content:center;padding-block:40px}
@@ -240,6 +253,17 @@ tfoot td{font-weight:700;border-bottom:0;border-top:2px solid var(--fg)}
         </div>
       </section>
 
+      <section class="no-print" id="install" hidden>
+        <div class="panel install">
+          <img src="/dashboard/icons/apple-touch-icon.png" alt="">
+          <div><b>Keep this on your home screen</b>
+            <p class="note" id="install-how"></p>
+            <button class="btn" id="install-btn" type="button" hidden>Add to home screen</button>
+          </div>
+          <button class="x" id="install-x" type="button" aria-label="Hide this tip">×</button>
+        </div>
+      </section>
+
       <section class="no-print">
         <a class="btn gold" href="#report">Create monthly report</a>
       </section>
@@ -304,13 +328,13 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
     msg.hidden = false; $("signin-btn").disabled = false; $("signin-btn").textContent = "Send sign-in link";
   });
 
-  $("signout").addEventListener("click", () => { store.clear(); memToken = null; DATA = null; location.hash = ""; show("signin"); });
+  $("signout").addEventListener("click", () => { store.clear(); memToken = null; DATA = null; history.replaceState(null, "", location.pathname); show("signin"); });
 
   // ---------- Load ----------
   async function load(){
     const url = new URL(location.href);
     const t = url.searchParams.get("t");
-    if (t) { store.set(t); memToken = t; url.searchParams.delete("t"); history.replaceState(null, "", url.pathname + url.hash); }
+    if (t) { store.set(t); memToken = t; }
     const token = store.get() || memToken;
     if (!token || !API) { show("signin"); return; }
     show("loading");
@@ -324,6 +348,8 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
         msg.hidden = false; return;
       }
       DATA = j; setup(); show("app"); route();
+      history.replaceState(null, "", location.pathname + "?t=" + encodeURIComponent(token) + location.hash);
+      setupInstall();
     } catch(err) {
       show("signin");
       const msg = $("signin-msg"); msg.className = "msg err"; msg.textContent = "Couldn't load your data. Check your connection and refresh.";
@@ -492,6 +518,22 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
         <div class="rep-foot">Months follow Airbnb payout dates. Expenses include guest refunds. Profit = revenue − running expenses; owner share is ${sharePct}% of profit.<br>Sandcastles Stays · +91 80727 70364 · aggrohit.aggarwal@gmail.com · sandcastlesstays.com</div>
       </div>`;
   }
+
+  // ---------- Home-screen app ----------
+  let installEvt = null;
+  window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; setupInstall(); });
+  function setupInstall(){
+    const standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+    let hidden = false; try { hidden = localStorage.getItem("sc_install_hidden") === "1"; } catch(e){}
+    if (!DATA || standalone || hidden) { $("install").hidden = true; return; }
+    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    if (installEvt) { $("install-how").textContent = "Open your earnings like an app, already signed in."; $("install-btn").hidden = false; }
+    else if (ios) { $("install-how").textContent = "In Safari, tap the Share button, then Add to Home Screen. It opens straight to your dashboard, already signed in."; }
+    else { $("install-how").textContent = "In Chrome, tap the ⋮ menu, then Add to Home screen or Install app. It opens straight to your dashboard, already signed in."; }
+    $("install").hidden = false;
+  }
+  $("install-btn").addEventListener("click", async () => { if (!installEvt) return; installEvt.prompt(); await installEvt.userChoice.catch(()=>{}); installEvt = null; $("install").hidden = true; });
+  $("install-x").addEventListener("click", () => { try { localStorage.setItem("sc_install_hidden","1"); } catch(e){} $("install").hidden = true; });
 
   function hasData(m){ return m.revenue || m.expenses; }
 
