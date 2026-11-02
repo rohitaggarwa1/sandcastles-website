@@ -52,11 +52,12 @@ a{color:inherit}
 .band{background:var(--navy);color:var(--on-navy)}
 .band .wrap{padding-block:16px 24px;display:grid;gap:18px}
 .top{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--on-navy)}
+.brand{display:flex;align-items:center;gap:10px;flex:none;text-decoration:none;color:var(--on-navy)}
 .brand svg{width:32px;height:32px;flex:none;color:var(--gold);--door:var(--navy)}
 .brand b{font:400 .95rem/1 var(--f-caps);letter-spacing:.22em}
 .who{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--on-navy-muted);min-width:0}
-.who span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40vw}
+.who span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+@media (max-width:420px){.who span{display:none}}
 .linkbtn{white-space:nowrap}
 .linkbtn{background:none;border:1px solid rgba(230,207,157,.45);color:var(--gold-soft);border-radius:999px;padding:4px 12px;font-size:12.5px;font-weight:600;cursor:pointer}
 .home h1{font-size:30px;line-height:1.15}
@@ -164,6 +165,30 @@ tfoot td{font-weight:700;border-bottom:0;border-top:2px solid var(--fg)}
   table{min-width:0}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.tabs{display:flex;gap:6px;margin-top:12px}
+.tabs a{color:var(--gold-soft);text-decoration:none;font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px;border:1px solid rgba(230,207,157,.35)}
+.tabs a.on{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.muted{background:var(--line);color:var(--muted)}
+.hk-day{display:grid;gap:8px}
+.hk-day h3{font-size:14px;margin:6px 0 0;color:var(--muted);font-weight:700;letter-spacing:.02em}
+.hk-day h3.today{color:var(--fg)}
+.hk{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:8px}
+.hk.done{opacity:.75}
+.hk.late{border-color:var(--warn)}
+.hk-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.hk-top b{font-size:15px}
+.hk-meta{font-size:12.5px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.hk-form{display:flex;gap:6px;flex-wrap:wrap}
+.hk-form input{flex:1 1 120px;min-width:0;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;font-size:13.5px;background:var(--bg);color:var(--fg)}
+.hk-form .btn{padding:8px 12px;font-size:13px}
+.small-btn{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:12.5px;padding:0}
+.staff{display:grid;gap:10px}
+.staff .who-row{font-size:13px;color:var(--muted)}
+.hk-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.hk-sum div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.hk-sum b{display:block;font-size:22px}
+.hk-sum span{font-size:12px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -211,13 +236,14 @@ tfoot td{font-weight:700;border-bottom:0;border-top:2px solid var(--fg)}
       <h1 id="p-name"></h1>
       <p id="p-sub"></p>
       <select class="switch" id="p-switch" aria-label="Choose a home" hidden></select>
+      <nav class="tabs" id="admin-tabs" hidden><a href="#" id="tab-homes">Homes</a><a href="#housekeeping" id="tab-hk">Housekeeping</a></nav>
     </div>
-    <div class="hero-num">
+    <div class="hero-num" id="hero">
       <div class="label" id="share-label">Your share, all time</div>
       <div class="big" id="k-owner"></div>
       <div class="sub" id="k-owner-sub"></div>
     </div>
-    <div class="kpis">
+    <div class="kpis" id="kpis">
       <div class="kpi"><div class="label">Revenue</div><div class="v" id="k-rev"></div></div>
       <div class="kpi"><div class="label">Expenses</div><div class="v" id="k-exp"></div></div>
       <div class="kpi"><div class="label">Occupancy</div><div class="v" id="k-occ"></div></div>
@@ -270,6 +296,22 @@ tfoot td{font-weight:700;border-bottom:0;border-top:2px solid var(--fg)}
 
       <p class="note">Months follow Airbnb payout dates. Expenses include guest refunds. Owner charges and payments you made to us are kept separately and aren't counted in profit.</p>
       <p class="foot">Questions? Sandcastles Stays · +91 80727 70364 · aggrohit.aggarwal@gmail.com</p>
+    </div>
+
+    <!-- Housekeeping (admin only) -->
+    <div class="wrap" id="view-hk" hidden>
+      <section>
+        <div class="hk-sum" id="hk-sum"></div>
+      </section>
+      <section>
+        <div class="sec-head"><h2>Turnovers</h2><small id="hk-range"></small></div>
+        <div id="hk-events" style="display:grid;gap:14px"></div>
+      </section>
+      <section>
+        <div class="sec-head"><h2>Staff and payments</h2><small id="hk-month"></small></div>
+        <div class="staff" id="hk-staff"></div>
+        <p class="note">Payments are expenses with words like salary, maid, housekeeping or cleaning in the details. Add names, phones and monthly pay in the Staff tab of the sheet.</p>
+      </section>
     </div>
 
     <!-- Report -->
@@ -363,6 +405,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
     sw.innerHTML = DATA.properties.map((p,i) => `<option value="${i}">${esc(p.name)}</option>`).join("");
     sw.hidden = DATA.properties.length < 2;
     sw.onchange = () => pick(+sw.value);
+    $("admin-tabs").hidden = !(DATA.admin && DATA.housekeeping);
     pick(0);
   }
 
@@ -373,9 +416,109 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
     if (location.hash === "#report") renderReport();
   }
 
+  // ---------- Housekeeping (admin) ----------
+  function dayName(d, today){
+    const diff = Math.round((Date.parse(d) - Date.parse(today)) / 864e5);
+    if (diff === 0) return "Today";
+    if (diff === 1) return "Tomorrow";
+    if (diff === -1) return "Yesterday";
+    const wd = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date(d + "T00:00:00").getDay()];
+    return wd + " " + +d.slice(8,10) + " " + MON[+d.slice(5,7)-1];
+  }
+  function renderHK(){
+    const H = DATA.housekeeping; if (!H) return;
+    $("p-name").textContent = "Housekeeping";
+    $("p-sub").textContent = `${DATA.properties.length} homes · ${dayName(H.from, H.today)} to ${dayName(H.to, H.today)}`;
+    const outs = H.events.filter(e => e.kind === "out");
+    const pending = outs.filter(e => !e.cleaned && e.date <= H.today);
+    const todayOut = outs.filter(e => e.date === H.today).length;
+    const weekIn = H.events.filter(e => e.kind === "in" && e.date <= addDays(H.today, 7)).length;
+    $("hk-sum").innerHTML = `<div><b>${todayOut}</b><span>check-outs today</span></div>
+      <div><b>${pending.length}</b><span>cleans not marked</span></div>
+      <div><b>${weekIn}</b><span>check-ins next 7 days</span></div>`;
+    $("hk-range").textContent = "Past 7 days and next 14";
+    const days = {};
+    H.events.forEach(e => (days[e.date] = days[e.date] || []).push(e));
+    const box = $("hk-events"); box.innerHTML = "";
+    const dates = Object.keys(days).sort();
+    if (!dates.length) box.innerHTML = `<p class="note">No check-ins or check-outs in this window.</p>`;
+    dates.forEach(d => {
+      const evs = days[d];
+      const wrap = document.createElement("div"); wrap.className = "hk-day";
+      wrap.innerHTML = `<h3 class="${d === H.today ? "today" : ""}">${dayName(d, H.today)}</h3>`;
+      evs.forEach(e => wrap.appendChild(hkCard(e, H.today)));
+      box.appendChild(wrap);
+    });
+    $("hk-month").textContent = mLabel(H.month, true);
+    const st = $("hk-staff");
+    st.innerHTML = H.staff.length ? "" : `<p class="note">No staff or staff payments found yet.</p>`;
+    H.staff.forEach(h => {
+      const el = document.createElement("div"); el.className = "panel";
+      let status;
+      if (h.expected && h.paidThisMonth >= h.expected) status = `<span class="pill">Paid this month</span>`;
+      else if (h.paidThisMonth) status = `<span class="pill warn">Part paid</span>`;
+      else status = `<span class="pill muted">Not paid yet this month</span>`;
+      const people = h.staff.filter(s => s.name || s.role).map(s =>
+        `${esc(s.name || "Name not added")}${s.role ? " · " + esc(s.role) : ""}${s.phone ? ` · <a href="tel:${esc(s.phone.replace(/\s/g,""))}">${esc(s.phone)}</a>` : ""}${s.pay ? " · " + inr(s.pay) + "/month" : ""}${s.payDay ? " · pay day " + esc(s.payDay) : ""}`).join("<br>");
+      el.innerHTML = `<div class="hk-top"><b>${esc(h.property)}</b>${status}</div>
+        <div class="who-row" style="margin:6px 0">${people || "No staff added in the sheet yet"}</div>
+        <div class="row"><span>Expected each month</span><span>${h.expected ? inr(h.expected) : "—"}</span></div>
+        <div class="row"><span>Paid this month</span><span>${inr(h.paidThisMonth)}</span></div>
+        <div class="row"><span>Paid last month</span><span>${inr(h.paidLastMonth)}</span></div>
+        ${h.payments.length ? `<details style="margin-top:6px"><summary class="note" style="cursor:pointer">Recent payments</summary>${h.payments.map(x => `<div class="row" style="font-size:13px;margin-top:4px"><span>${dLabel(x.date)} · ${esc(x.details)}</span><span>${inr(x.amount)}</span></div>`).join("")}</details>` : ""}`;
+      st.appendChild(el);
+    });
+  }
+  function addDays(d, n){ const t = new Date(d + "T00:00:00Z"); t.setUTCDate(t.getUTCDate() + n); return t.toISOString().slice(0,10); }
+  function hkCard(e, today){
+    const el = document.createElement("div");
+    const who = e.owner ? `<span class="pill stay">Owner stay</span>` : (e.guests ? `${e.guests} guest${e.guests>1?"s":""}` : "");
+    const nights = e.nights ? `${e.nights} night${e.nights>1?"s":""}` : "";
+    if (e.kind === "in") {
+      el.className = "hk";
+      el.innerHTML = `<div class="hk-top"><b>${esc(e.property)}</b><span class="pill muted">Check-in</span></div>
+        <div class="hk-meta">${[who, nights].filter(Boolean).join(" · ")}</div>`;
+      return el;
+    }
+    const late = !e.cleaned && e.date < today;
+    el.className = "hk" + (e.cleaned ? " done" : "") + (late ? " late" : "");
+    const badges = [`<span class="pill ${e.cleaned ? "" : "warn"}">${e.cleaned ? "Cleaned" : late ? "Not marked" : "Check-out"}</span>`];
+    if (e.sameDayIn) badges.unshift(`<span class="pill warn">Same-day check-in</span>`);
+    el.innerHTML = `<div class="hk-top"><b>${esc(e.property)}</b><span>${badges.join(" ")}</span></div>
+      <div class="hk-meta">${[who, nights].filter(Boolean).join(" · ")}</div>
+      ${e.cleaned
+        ? `<div class="hk-meta">Cleaned${e.cleaned.by ? " by " + esc(e.cleaned.by) : ""}${e.cleaned.at ? " · " + esc(e.cleaned.at) : ""}${e.cleaned.note ? " · " + esc(e.cleaned.note) : ""} <button class="small-btn" type="button" data-undo>Undo</button></div>`
+        : (e.date <= addDays(today, 1) ? `<form class="hk-form"><input name="by" placeholder="Cleaned by" autocomplete="off"><input name="note" placeholder="Note (optional)" autocomplete="off"><button class="btn" type="submit">Mark cleaned</button></form>` : "")}`;
+    const f = el.querySelector("form");
+    if (f) f.addEventListener("submit", async ev => {
+      ev.preventDefault(); const b = f.querySelector("button"); b.disabled = true; b.textContent = "Saving…";
+      const ok = await cleanCall(e, {by: f.by.value.trim(), note: f.note.value.trim()});
+      if (ok) { e.cleaned = {by: f.by.value.trim(), note: f.note.value.trim(), at: "just now"}; el.replaceWith(hkCard(e, today)); renderHKSum(); }
+      else { b.disabled = false; b.textContent = "Try again"; }
+    });
+    const u = el.querySelector("[data-undo]");
+    if (u) u.addEventListener("click", async () => {
+      u.disabled = true; u.textContent = "Undoing…";
+      if (await cleanCall(e, {undo: "1"})) { e.cleaned = null; el.replaceWith(hkCard(e, today)); renderHKSum(); }
+      else { u.disabled = false; u.textContent = "Undo"; }
+    });
+    return el;
+  }
+  function renderHKSum(){
+    const H = DATA.housekeeping, outs = H.events.filter(e => e.kind === "out");
+    const pending = outs.filter(e => !e.cleaned && e.date <= H.today).length;
+    const b = $("hk-sum").querySelectorAll("b"); if (b[1]) b[1].textContent = pending;
+  }
+  async function cleanCall(e, extra){
+    const q = new URLSearchParams({action: "clean", token: store.get() || memToken, property: e.property, date: e.date, ...extra});
+    try { const r = await fetch(API + "?" + q); const j = await r.json(); if (!j.ok) alertMsg(j.error); return j.ok; }
+    catch(err){ alertMsg("Couldn't reach the sheet. Check your connection."); return false; }
+  }
+  function alertMsg(t){ const n = document.createElement("p"); n.className = "note"; n.style.color = "var(--warn)"; n.textContent = t; $("hk-events").prepend(n); setTimeout(() => n.remove(), 6000); }
+
   // ---------- Home ----------
   function totals(ms){
-    const t = ms.reduce((a,m) => { a.rev+=m.revenue; a.exp+=m.expenses; a.pro+=m.profit; a.own+=m.ownerShare; a.sc+=m.sandcastlesShare; a.on+=m.ownerNights;
+    const t = ms.reduce((a,m) => { if (m.accountsPending) { if (m.occupancy != null){ a.g+=m.guestNights; a.av+=m.days-m.ownerNights; a.occM++; } a.on+=m.ownerNights; return a; } a.rev+=m.revenue; a.exp+=m.expenses; a.pro+=m.profit; a.own+=m.ownerShare; a.sc+=m.sandcastlesShare; a.on+=m.ownerNights;
       if (m.occupancy != null){ a.g+=m.guestNights; a.av+=m.days-m.ownerNights; a.occM++; } return a; },
       {rev:0,exp:0,pro:0,own:0,sc:0,on:0,g:0,av:0,occM:0});
     t.occ = t.occM ? (t.av ? t.g/t.av : null) : null;
@@ -388,7 +531,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
     $("p-sub").textContent = [P.location, ms.length ? `${mLabel(ms[0].month)} – ${mLabel(ms[ms.length-1].month)}` : ""].filter(Boolean).join(" · ");
     $("share-label").textContent = `Your share, all time · ${Math.round(P.share*100)}% of profit`;
     $("k-owner").textContent = inr(t.own);
-    $("k-owner-sub").textContent = active.length ? `Across ${active.length} months · about ${inr(t.own/active.length)} a month` : "";
+    $("k-owner-sub").textContent = active.length ? `Across ${active.length} month${active.length>1?"s":""} · about ${inr(t.own/active.length)} a month` : "";
     $("k-rev").textContent = inr(t.rev);
     $("k-exp").textContent = inr(t.exp);
     const last = [...ms].reverse().find(m => m.occupancy != null);
@@ -413,13 +556,15 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
       const tags = [];
       if (m.ownerNights) tags.push(`<span class="pill stay">You stayed ${m.ownerNights} night${m.ownerNights>1?"s":""}</span>`);
       if (m.occupancy != null) tags.push(`<span class="pill">${pct(m.occupancy)} occupied</span>`);
+      if (m.accountsPending) tags.push(`<span class="pill muted">Accounts not updated yet</span>`);
       if (!tags.length) tags.push(`Profit ${inr(m.profit)}`);
       el.innerHTML = `<button aria-expanded="false" id="m-${m.month}">
         <div class="m-name">${mLabel(m.month, true)}<small>${tags.join("")}</small></div>
-        <div class="m-share ${m.ownerShare<0?"neg":""}">${inr(m.ownerShare)}<small>your share</small></div>
+        <div class="m-share ${m.ownerShare<0?"neg":""}">${m.accountsPending ? "—" : inr(m.ownerShare)}<small>${m.accountsPending ? "coming soon" : "your share"}</small></div>
         <div class="chev" aria-hidden="true">›</div></button>
         <div class="m-body" hidden>
-          <div class="row"><span>Booking revenue</span><span>${inr(m.revenue,2)}</span></div>
+          ${m.accountsPending ? `<p class="note">Payouts and expenses for this month haven't been added yet. Occupancy below is already up to date.</p>` : ""}
+          <div class="row"><span>Booking revenue</span><span>${m.accountsPending ? "—" : inr(m.revenue,2)}</span></div>
           <div class="row"><span>Running expenses</span><span>− ${inr(m.expenses,2)}</span></div>
           <div class="row"><span>Net profit</span><span>${inr(m.profit,2)}</span></div>
           <div class="row"><span>Sandcastles (${Math.round((1-P.share)*100)}%)</span><span>${inr(m.sandcastlesShare,2)}</span></div>
@@ -486,7 +631,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
     const start = a + "-01", endM = b;
     const stays = P.stays.filter(s => s.checkOut > start && s.checkIn.slice(0,7) <= endM);
     const act = ms.filter(hasData);
-    const best = ms.reduce((x,m) => !x || m.ownerShare > x.ownerShare ? m : x, null);
+    const best = act.reduce((x,m) => !x || m.ownerShare > x.ownerShare ? m : x, null);
     const sharePct = Math.round(P.share*100);
     $("report").innerHTML = `
       <div class="rep-head">
@@ -505,7 +650,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
         </div>
         <div class="tbl"><table>
           <thead><tr><th>Month</th><th>Revenue</th><th>Expenses</th><th>Profit</th><th>Owner share</th><th>Your stay</th><th>Occupancy</th></tr></thead>
-          <tbody>${ms.map(m => `<tr><td>${mLabel(m.month)}</td><td>${inr(m.revenue)}</td><td>${inr(m.expenses)}</td><td>${inr(m.profit)}</td><td>${inr(m.ownerShare)}</td><td>${m.ownerNights ? m.ownerNights + " n" : "—"}</td><td>${pct(m.occupancy)}</td></tr>`).join("")}</tbody>
+          <tbody>${ms.map(m => m.accountsPending ? `<tr><td>${mLabel(m.month)}</td><td colspan="4" style="color:var(--muted)">Accounts not updated yet</td>` : `<tr><td>${mLabel(m.month)}</td><td>${inr(m.revenue)}</td><td>${inr(m.expenses)}</td><td>${inr(m.profit)}</td><td>${inr(m.ownerShare)}</td><td>${m.ownerNights ? m.ownerNights + " n" : "—"}</td><td>${pct(m.occupancy)}</td></tr>`).join("")}</tbody>
           <tfoot><tr><td>Total</td><td>${inr(t.rev)}</td><td>${inr(t.exp)}</td><td>${inr(t.pro)}</td><td>${inr(t.own)}</td><td>${t.on ? t.on + " n" : "—"}</td><td>${t.occ != null ? pct(t.occ) : "—"}</td></tr></tfoot>
         </table></div>
         <div>
@@ -535,15 +680,20 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
   $("install-btn").addEventListener("click", async () => { if (!installEvt) return; installEvt.prompt(); await installEvt.userChoice.catch(()=>{}); installEvt = null; $("install").hidden = true; });
   $("install-x").addEventListener("click", () => { try { localStorage.setItem("sc_install_hidden","1"); } catch(e){} $("install").hidden = true; });
 
-  function hasData(m){ return m.revenue || m.expenses; }
+  function hasData(m){ return !m.accountsPending && (m.revenue || m.expenses); }
 
   function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 
   // ---------- Views ----------
   function route(){
     if (!DATA) return;
-    const rep = location.hash === "#report";
-    $("view-home").hidden = rep; $("view-report").hidden = !rep;
+    const hk = location.hash === "#housekeeping" && DATA.admin && DATA.housekeeping;
+    const rep = !hk && location.hash === "#report";
+    $("view-home").hidden = rep || hk; $("view-report").hidden = !rep; $("view-hk").hidden = !hk;
+    $("hero").hidden = hk; $("kpis").hidden = hk; $("p-switch").hidden = hk || DATA.properties.length < 2;
+    $("tab-homes").classList.toggle("on", !hk); $("tab-hk").classList.toggle("on", !!hk);
+    if (hk) renderHK();
+    else if (P) { const n = $("p-name"); if (n.textContent !== P.name) renderHome(); }
     if (rep) renderReport();
     window.scrollTo(0, 0);
   }
