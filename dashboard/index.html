@@ -189,6 +189,15 @@ tfoot td{font-weight:700;border-bottom:0;border-top:2px solid var(--fg)}
 .hk-sum div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
 .hk-sum b{display:block;font-size:22px}
 .hk-sum span{font-size:12px;color:var(--muted)}
+.tn-sum{font-size:13px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.tn-area{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:10px 0 0}
+.tn-price{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.tn-price .rs{position:relative;flex:1 1 120px;min-width:0}
+.tn-price .rs span{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px}
+.tn-price input{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:8px;padding:8px 10px 8px 24px;font:inherit;font-size:15px;font-weight:700;background:var(--bg);color:var(--fg)}
+.tn-price .btn{padding:8px 12px;font-size:13px}
+.tn-link{font-size:12.5px;color:var(--muted);text-decoration:underline}
+details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding:6px 0}
 </style>
 </head>
 <body>
@@ -300,6 +309,12 @@ tfoot td{font-weight:700;border-bottom:0;border-top:2px solid var(--fg)}
 
     <!-- Housekeeping (admin only) -->
     <div class="wrap" id="view-hk" hidden>
+      <section>
+        <div class="sec-head"><h2>Tonight</h2><small><button class="small-btn" id="tn-refresh" type="button">Refresh</button></small></div>
+        <div class="tn-sum" id="tn-sum">Checking Airbnb calendars…</div>
+        <div id="tn-list" style="display:grid;gap:8px"></div>
+        <p class="note">Saving a price here records it for the team. Change it on Airbnb or PriceLabs with the "Open in Airbnb" link. Tata Housing is left out because it doesn't allow last-minute bookings.</p>
+      </section>
       <section>
         <div class="hk-sum" id="hk-sum"></div>
       </section>
@@ -469,6 +484,71 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
       st.appendChild(el);
     });
   }
+  // ---------- Tonight board ----------
+  let TN = null, tnLoading = false;
+  async function loadTonight(force){
+    if (tnLoading || (TN && !force)) { if (TN) renderTonight(); return; }
+    tnLoading = true; $("tn-sum").textContent = "Checking Airbnb calendars…";
+    try {
+      const j = await fetch(API + "?action=tonight&token=" + encodeURIComponent(store.get() || memToken)).then(r => r.json());
+      if (!j.ok) throw new Error(j.error || "failed");
+      TN = j; renderTonight();
+    } catch(err) { $("tn-sum").textContent = "Couldn't check the calendars. Tap Refresh to try again."; }
+    tnLoading = false;
+  }
+  function who(by){ return by && by.includes("@") ? by.split("@")[0] : by; }
+  function tnCard(l){
+    const el = document.createElement("div"); el.className = "hk";
+    const today = TN.today;
+    let line;
+    if (l.state === "empty") {
+      line = l.next ? `Free tonight · next ${l.nextReserved ? "guest" : "block"} ${dayName(l.next, today)}` + (l.next > addDays(today,1) ? ` (${Math.round((Date.parse(l.next)-Date.parse(today))/864e5)} nights free)` : "") : "Free tonight · nothing booked ahead";
+      if (l.checkoutToday) line += " · guest checked out today";
+    } else line = `Closed on Airbnb until ${dayName(l.until, today)}`;
+    const saved = l.price != null && l.priceDate === today;
+    const last = l.price != null && !saved ? `Last set ₹${l.price.toLocaleString("en-IN")} ${/^(Yesterday|Today|Tomorrow)$/.test(dayName(l.priceDate, today)) ? dayName(l.priceDate, today).toLowerCase() : "on " + dayName(l.priceDate, today)}` : "";
+    el.innerHTML = `<div class="hk-top"><b>${esc(l.name)}</b><span class="pill ${l.state === "empty" ? "" : "muted"}">${l.state === "empty" ? "Empty" : "Closed"}</span></div>
+      <div class="hk-meta">${esc(line)}</div>
+      <form class="tn-price"><div class="rs"><span>₹</span><input name="price" inputmode="numeric" pattern="[0-9]*" placeholder="Tonight's price" value="${saved ? l.price : ""}" aria-label="Tonight's price for ${esc(l.name)}"></div>
+        <button class="btn" type="submit">${saved ? "Update" : "Save"}</button>
+        <a class="tn-link" href="https://www.airbnb.co.in/multicalendar/${l.id}" target="_blank" rel="noopener">Open in Airbnb</a></form>
+      <div class="hk-meta" data-status>${saved ? `Set ₹${l.price.toLocaleString("en-IN")} by ${esc(who(l.by))} at ${esc(l.at.slice(11))}` : esc(last)}</div>`;
+    const f = el.querySelector("form");
+    f.addEventListener("submit", async ev => {
+      ev.preventDefault();
+      const price = +f.price.value.replace(/[^0-9]/g, ""), st = el.querySelector("[data-status]"), b = f.querySelector("button");
+      if (!price) { st.textContent = "Enter a price in rupees."; return; }
+      b.disabled = true; b.textContent = "Saving…";
+      try {
+        const q = new URLSearchParams({action: "price", token: store.get() || memToken, id: l.id, price, date: today});
+        const j = await fetch(API + "?" + q).then(r => r.json());
+        if (!j.ok) throw new Error(j.error);
+        Object.assign(l, {price: j.price, priceDate: j.date, by: j.by, at: j.at});
+        el.replaceWith(tnCard(l));
+      } catch(err) { st.textContent = err.message || "Couldn't save. Try again."; b.disabled = false; b.textContent = "Save"; }
+    });
+    return el;
+  }
+  function renderTonight(){
+    const L = TN.listings, box = $("tn-list"); box.innerHTML = "";
+    const empty = L.filter(l => l.state === "empty"), closed = L.filter(l => l.state === "blocked"), booked = L.filter(l => l.state === "booked");
+    $("tn-sum").innerHTML = `<span class="pill">${empty.length} empty</span><span class="pill muted">${closed.length} closed</span><span class="pill warn">${booked.length} booked</span><span>of ${L.length} listings</span>`;
+    const byArea = list => { const g = {}; list.forEach(l => (g[l.area || "Other"] = g[l.area || "Other"] || []).push(l)); return g; };
+    const addGroup = (list, parent) => Object.entries(byArea(list)).forEach(([a, ls]) => {
+      const h = document.createElement("div"); h.className = "tn-area"; h.textContent = a; parent.appendChild(h);
+      ls.forEach(l => parent.appendChild(tnCard(l)));
+    });
+    if (!empty.length) box.insertAdjacentHTML("beforeend", `<p class="note">Every open listing is booked tonight.</p>`);
+    addGroup(empty, box);
+    if (closed.length) {
+      const d = document.createElement("details"); d.className = "tn-more";
+      d.innerHTML = `<summary>Closed on Airbnb tonight (${closed.length})</summary>`;
+      const inner = document.createElement("div"); inner.style.cssText = "display:grid;gap:8px"; addGroup(closed, inner); d.appendChild(inner); box.appendChild(d);
+    }
+    if (booked.length) box.insertAdjacentHTML("beforeend", `<details class="tn-more"><summary>Booked tonight (${booked.length})</summary><p class="note">${booked.map(l => esc(l.name) + (l.until ? " · until " + dayName(l.until, TN.today) : "")).join("<br>")}</p></details>`);
+  }
+  $("tn-refresh").addEventListener("click", () => loadTonight(true));
+
   function addDays(d, n){ const t = new Date(d + "T00:00:00Z"); t.setUTCDate(t.getUTCDate() + n); return t.toISOString().slice(0,10); }
   function hkCard(e, today){
     const el = document.createElement("div");
@@ -692,7 +772,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
     $("view-home").hidden = rep || hk; $("view-report").hidden = !rep; $("view-hk").hidden = !hk;
     $("hero").hidden = hk; $("kpis").hidden = hk; $("p-switch").hidden = hk || DATA.properties.length < 2;
     $("tab-homes").classList.toggle("on", !hk); $("tab-hk").classList.toggle("on", !!hk);
-    if (hk) renderHK();
+    if (hk) { renderHK(); loadTonight(false); }
     else if (P) { const n = $("p-name"); if (n.textContent !== P.name) renderHome(); }
     if (rep) renderReport();
     window.scrollTo(0, 0);
