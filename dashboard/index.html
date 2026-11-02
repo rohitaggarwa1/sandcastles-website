@@ -198,6 +198,15 @@ tfoot td{font-weight:700;border-bottom:0;border-top:2px solid var(--fg)}
 .tn-price .btn{padding:8px 12px;font-size:13px}
 .tn-link{font-size:12.5px;color:var(--muted);text-decoration:underline}
 details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding:6px 0}
+.info-search{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:15px;background:var(--card);color:var(--fg)}
+.info-card summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.info-card summary::-webkit-details-marker{display:none}
+.info-card summary b{font-size:15px}
+.info-field{margin-top:10px}
+.info-field .label{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.info-val{white-space:pre-wrap;font-size:14.5px;line-height:1.55;margin-top:3px;font-variant-numeric:tabular-nums}
+.info-val.masked{filter:blur(6px);user-select:none}
+.info-field.admin .label{color:var(--warn)}
 </style>
 </head>
 <body>
@@ -245,7 +254,7 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
       <h1 id="p-name"></h1>
       <p id="p-sub"></p>
       <select class="switch" id="p-switch" aria-label="Choose a home" hidden></select>
-      <nav class="tabs" id="admin-tabs" hidden><a href="#" id="tab-homes">Homes</a><a href="#housekeeping" id="tab-hk">Housekeeping</a><a href="#reviews" id="tab-rv">Reviews</a></nav>
+      <nav class="tabs" id="admin-tabs" hidden><a href="#" id="tab-homes">Homes</a><a href="#housekeeping" id="tab-hk">Housekeeping</a><a href="#reviews" id="tab-rv">Reviews</a><a href="#info" id="tab-info">Info</a></nav>
     </div>
     <div class="hero-num" id="hero">
       <div class="label" id="share-label">Your share, all time</div>
@@ -326,6 +335,16 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
         <div class="sec-head"><h2 id="hk-staff-h">Staff and payments</h2><small id="hk-month"></small></div>
         <div class="staff" id="hk-staff"></div>
         <p class="note">Payments are expenses with words like salary, maid, housekeeping or cleaning in the details. Add names, phones and monthly pay in the Staff tab of the sheet.</p>
+      </section>
+    </div>
+
+    <!-- Property info (team only) -->
+    <div class="wrap" id="view-info" hidden>
+      <section>
+        <input class="info-search" id="info-q" type="search" placeholder="Search a home, code or Wi-Fi…" autocomplete="off" aria-label="Search property info">
+        <p class="hk-meta" id="info-status">Loading…</p>
+        <div id="info-list" style="display:grid;gap:8px"></div>
+        <p class="note">Codes stay blurred until you tap Show. Edit the "Property Info" tab of the sheet to change anything; it shows here straight away. Only the Sandcastles team can see this page.</p>
       </section>
     </div>
 
@@ -448,7 +467,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
     sw.onchange = () => pick(+sw.value);
     $("admin-tabs").hidden = !DATA.housekeeping;
     $("tab-homes").hidden = !DATA.properties.length;
-    if (!DATA.properties.length) { if (!/^#(housekeeping|reviews)$/.test(location.hash)) history.replaceState(null, "", location.pathname + location.search + "#housekeeping"); return; }
+    if (!DATA.properties.length) { if (!/^#(housekeeping|reviews|info)$/.test(location.hash)) history.replaceState(null, "", location.pathname + location.search + "#housekeeping"); return; }
     pick(0);
   }
 
@@ -566,6 +585,43 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
       rvStatus(`Synced just now: ${res.imported} pending review${res.imported === 1 ? "" : "s"}, ${res.phonesSaved} phone number${res.phonesSaved === 1 ? "" : "s"} on file.`);
     } catch(err) { rvStatus("Couldn't save the sync: " + err.message); }
   });
+
+  // ---------- Property info ----------
+  let INFO = null, infoLoading = false;
+  async function loadInfo(force){
+    if (INFO && !force) { renderInfo(); return; }
+    if (infoLoading) return; infoLoading = true;
+    $("info-status").textContent = "Loading…"; $("info-status").hidden = false;
+    try {
+      const j = await fetch(API + "?action=info&token=" + encodeURIComponent(store.get() || memToken)).then(r => r.json());
+      if (!j.ok) throw new Error(j.error || "failed");
+      INFO = j.homes; renderInfo();
+    } catch(err) { $("info-status").textContent = "Couldn't load property info. Refresh to try again."; }
+    infoLoading = false;
+  }
+  function renderInfo(){
+    const q = $("info-q").value.trim().toLowerCase();
+    const list = $("info-list"); list.innerHTML = "";
+    const homes = INFO.filter(h => !q || (h.name + " " + h.area + " " + h.fields.map(f => f.value).join(" ")).toLowerCase().includes(q));
+    $("info-status").textContent = homes.length ? "" : "No home matches that search."; $("info-status").hidden = !!homes.length;
+    let area = null;
+    homes.forEach(h => {
+      if (h.area !== area) { area = h.area; const a = document.createElement("div"); a.className = "tn-area"; a.textContent = area || "Other"; list.appendChild(a); }
+      const d = document.createElement("details"); d.className = "hk info-card";
+      if (q) d.open = true;
+      d.innerHTML = `<summary><b>${esc(h.name)}</b><span class="hk-meta">${h.fields.length} item${h.fields.length === 1 ? "" : "s"}</span></summary>` +
+        h.fields.map((f, i) => `<div class="info-field${/admin/i.test(f.label) ? " admin" : ""}"><div class="label"><span>${esc(f.label)}</span><span><button class="small-btn" type="button" data-show="${i}">Show</button> · <button class="small-btn" type="button" data-copy="${i}">Copy</button></span></div><div class="info-val masked" data-val="${i}">${esc(f.value)}</div></div>`).join("");
+      d.addEventListener("click", async e => {
+        const s = e.target.closest("[data-show]"), c = e.target.closest("[data-copy]");
+        if (s) { const v = d.querySelector(`[data-val="${s.dataset.show}"]`); const hid = v.classList.toggle("masked"); s.textContent = hid ? "Show" : "Hide"; }
+        if (c) { try { await navigator.clipboard.writeText(h.fields[+c.dataset.copy].value); c.textContent = "Copied"; setTimeout(() => c.textContent = "Copy", 1500); } catch(err) { c.textContent = "Copy failed"; } }
+      });
+      d.addEventListener("toggle", () => { if (!d.open) d.querySelectorAll(".info-val").forEach(v => v.classList.add("masked")), d.querySelectorAll("[data-show]").forEach(b => b.textContent = "Show"); });
+      list.appendChild(d);
+    });
+  }
+  $("info-q").addEventListener("input", () => INFO && renderInfo());
+  document.addEventListener("visibilitychange", () => { if (document.hidden) document.querySelectorAll("#info-list .info-val").forEach(v => v.classList.add("masked")); });
 
   // ---------- Tonight board ----------
   let TN = null, tnLoading = false;
@@ -851,15 +907,17 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
   function route(){
     if (!DATA) return;
     const opsOnly = !DATA.properties.length;
-    const hk = !!DATA.housekeeping && (location.hash === "#housekeeping" || (opsOnly && location.hash !== "#reviews"));
+    const hk = !!DATA.housekeeping && (location.hash === "#housekeeping" || (opsOnly && !/^#(reviews|info)$/.test(location.hash)));
     const rv = !hk && location.hash === "#reviews" && !!DATA.reviews;
-    const ops = hk || rv;
+    const info = !hk && !rv && location.hash === "#info" && !!DATA.housekeeping;
+    const ops = hk || rv || info;
     const rep = !ops && location.hash === "#report";
-    $("view-home").hidden = rep || ops; $("view-report").hidden = !rep; $("view-hk").hidden = !hk; $("view-rv").hidden = !rv;
+    $("view-home").hidden = rep || ops; $("view-report").hidden = !rep; $("view-hk").hidden = !hk; $("view-rv").hidden = !rv; $("view-info").hidden = !info;
     $("hero").hidden = ops; $("kpis").hidden = ops; $("p-switch").hidden = ops || DATA.properties.length < 2;
-    $("tab-homes").classList.toggle("on", !ops); $("tab-hk").classList.toggle("on", !!hk); $("tab-rv").classList.toggle("on", !!rv);
+    $("tab-homes").classList.toggle("on", !ops); $("tab-hk").classList.toggle("on", !!hk); $("tab-rv").classList.toggle("on", !!rv); $("tab-info").classList.toggle("on", !!info);
     if (hk) { renderHK(); loadTonight(false); }
     if (rv) renderReviews();
+    if (info) { $("p-name").textContent = "Property info"; $("p-sub").textContent = "Codes, Wi-Fi and parking for every home"; loadInfo(false); }
     if (!ops && P) { const n = $("p-name"); if (n.textContent !== P.name) renderHome(); }
     if (rep) renderReport();
     window.scrollTo(0, 0);
