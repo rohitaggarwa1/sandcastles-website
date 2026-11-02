@@ -207,6 +207,16 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
 .info-val{white-space:pre-wrap;font-size:14.5px;line-height:1.55;margin-top:3px;font-variant-numeric:tabular-nums}
 .info-val.masked{filter:blur(6px);user-select:none}
 .info-field.admin .label{color:var(--warn)}
+.neg-filter{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.neg-filter button{border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:999px;padding:5px 12px;font:inherit;font-size:13px;cursor:pointer}
+.neg-filter button.on{background:var(--navy);color:var(--on-navy);border-color:var(--navy)}
+.stars{color:#d9822b;letter-spacing:1px;font-size:14px}
+.neg-text{font-size:14px;line-height:1.5;white-space:pre-wrap;margin:0}
+.neg-text.clip{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.neg-form{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.neg-form select,.neg-form input{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;font-size:13.5px;background:var(--bg);color:var(--fg)}
+.neg-form input{flex:1 1 160px;min-width:0}
+.neg-form .btn{padding:8px 12px;font-size:13px}
 </style>
 </head>
 <body>
@@ -361,6 +371,12 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
             <p class="note">After that: tap "Sync now from Airbnb", then click the bookmark in the Airbnb tab that opens. This page updates on its own. The bookmark only reads Airbnb and contains no passwords.</p>
           </div>
         </details>
+      </section>
+      <section>
+        <div class="sec-head"><h2>Negative reviews</h2><small id="neg-sub">3 stars or less · last 6 months</small></div>
+        <div class="tn-sum" id="neg-sum"></div>
+        <div class="neg-filter" id="neg-filter"></div>
+        <div id="neg-list" style="display:grid;gap:8px;margin-top:10px"></div>
       </section>
       <section>
         <div class="sec-head"><h2>We review the guest</h2><small>Write ours before the window closes</small></div>
@@ -534,6 +550,50 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
       st.appendChild(el);
     });
   }
+  // ---------- Negative reviews ----------
+  let negFilter = "active";
+  const NEG_GROUPS = {active: ["Open", "Removal requested"], closed: ["Removed", "Not removed", "Skip"], all: null};
+  function renderNegative(){
+    const N = DATA.negative || {items: [], statuses: []};
+    const items = N.items, month = new Date().toISOString().slice(0, 7);
+    const count = st => items.filter(r => r.status === st).length;
+    const closedThisMonth = st => items.filter(r => r.status === st && (r.closed || "").slice(0, 7) === month).length;
+    $("neg-sum").innerHTML = `<span class="pill warn">${count("Open")} open</span><span class="pill muted">${count("Removal requested")} requested</span><span class="pill">${count("Removed")} removed</span>` +
+      `<span>This month: ${closedThisMonth("Removed")} removed, ${closedThisMonth("Not removed")} not removed</span>`;
+    $("neg-sub").textContent = "3 stars or less · last 6 months" + (N.updated ? " · synced " + N.updated : " · not synced yet");
+    $("neg-filter").innerHTML = [["active", "To work on"], ["closed", "Done"], ["all", "All"]].map(([k, l]) => `<button type="button" data-f="${k}" class="${k === negFilter ? "on" : ""}">${l}</button>`).join("");
+    const list = $("neg-list"); list.innerHTML = "";
+    const shown = items.filter(r => !NEG_GROUPS[negFilter] || NEG_GROUPS[negFilter].includes(r.status));
+    if (!shown.length) list.innerHTML = `<p class="note">${items.length ? "Nothing here." : "No negative reviews loaded yet. They fill in on the next Airbnb sync."}</p>`;
+    shown.forEach(r => list.appendChild(negCard(r, N.statuses)));
+  }
+  function negCard(r, statuses){
+    const el = document.createElement("div"); el.className = "hk";
+    const stars = "★".repeat(Math.max(0, Math.min(5, r.stars))) + "☆".repeat(Math.max(0, 5 - r.stars));
+    const gone = r.lastSeen && DATA.negative.updated && r.lastSeen < DATA.negative.updated.slice(0, 10) && r.status !== "Removed";
+    el.innerHTML = `<div class="hk-top"><b>${esc(r.listing)}</b><span class="stars" aria-label="${r.stars} stars">${stars}</span></div>
+      <div class="hk-meta">${esc(r.guest || "Guest")} · reviewed ${esc(r.date)}${r.code ? " · " + esc(r.code) : ""}${gone ? ` · <span class="pill">No longer on Airbnb</span>` : ""}</div>
+      ${r.text ? `<p class="neg-text clip">${esc(r.text)}</p>` : ""}
+      ${r.privateNote ? `<p class="hk-meta"><b>Private note:</b> ${esc(r.privateNote)}</p>` : ""}
+      <div class="hk-meta">${r.link ? `<a href="${esc(r.link)}" target="_blank" rel="noopener">Open on Airbnb</a>` : ""}${r.requested ? ` · requested ${esc(r.requested)}` : ""}${r.closed ? ` · closed ${esc(r.closed)}` : ""}${r.by ? ` · ${esc(r.by)}` : ""}</div>
+      <form class="neg-form"><select name="status" aria-label="Status">${statuses.map(st => `<option${st === r.status ? " selected" : ""}>${esc(st)}</option>`).join("")}</select>
+        <input name="notes" placeholder="Notes (reason given, case no.)" value="${esc(r.notes || "")}"><button class="btn" type="submit">Save</button></form>`;
+    const t = el.querySelector(".neg-text"); if (t) t.addEventListener("click", () => t.classList.toggle("clip"));
+    const f = el.querySelector("form");
+    f.addEventListener("submit", async ev => {
+      ev.preventDefault(); const b = f.querySelector("button"); b.disabled = true; b.textContent = "Saving…";
+      try {
+        const q = new URLSearchParams({action: "negstatus", token: store.get() || memToken, id: r.id, status: f.status.value, notes: f.notes.value});
+        const j = await fetch(API + "?" + q).then(x => x.json());
+        if (!j.ok) throw new Error(j.error);
+        Object.assign(r, {status: j.status, by: j.by, requested: j.requested, closed: j.closed, notes: j.notes});
+        renderNegative();
+      } catch(err) { b.disabled = false; b.textContent = "Try again"; }
+    });
+    return el;
+  }
+  $("neg-filter").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if (b) { negFilter = b.dataset.f; renderNegative(); } });
+
   // ---------- Reviews ----------
   function rvCard(r, today){
     const el = document.createElement("div");
@@ -551,6 +611,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
     const R = DATA.reviews || {items: [], updated: ""};
     const today = (DATA.housekeeping && DATA.housekeeping.today) || new Date().toISOString().slice(0,10);
     $("p-name").textContent = "Reviews";
+    renderNegative();
     $("p-sub").textContent = R.updated ? "Updated from Airbnb " + R.updated : "Not synced yet";
     const host = R.items.filter(r => r.type === "host"), guest = R.items.filter(r => r.type === "guest");
     $("rv-sum").innerHTML = `<span class="pill warn">${host.length} for us to write</span><span class="pill">${guest.length} waiting on guests</span><span>${R.items.filter(r => r.phone).length} with phone</span>`;
