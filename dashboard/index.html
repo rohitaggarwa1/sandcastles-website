@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Owner Dashboard · Sandcastles</title>
+<meta name="description" content="Earnings, expenses and occupancy for homes managed by Sandcastles Stays.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Marcellus&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: navy masthead with the home's headline numbers → chart → month cards → stays → report view. Same navy + sand gold as the rest of the site. */
+:root{
+  --navy:#14213a; --navy-2:#1d2d4d; --gold:#c49a4a; --gold-soft:#e6cf9d;
+  --bg:#f7f2e8; --card:#fffdf8; --line:#e5dccb; --fg:#1a2236; --muted:#5f6779;
+  --on-navy:#f3ead8; --on-navy-muted:#b9bfcc;
+  --good:#2f7d55; --good-soft:#e2f1e8; --warn:#a4621a; --warn-soft:#f6e8d3; --bad:#b23b3b;
+  --exp:#9aa3b5;
+  --f-display:"Playfair Display", Georgia, "Times New Roman", serif;
+  --f-caps:"Marcellus", Georgia, serif;
+  --f-body:"Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1626; --card:#16213a; --line:#2a3854; --fg:#ece4d4; --muted:#a3aabb; --gold:#d6ae62;
+  --good:#6cc597; --good-soft:#173528; --warn:#e3a35a; --warn-soft:#3a2a16; --bad:#e07a7a; --exp:#5d6a85; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1626; --card:#16213a; --line:#2a3854; --fg:#ece4d4; --muted:#a3aabb; --gold:#d6ae62;
+  --good:#6cc597; --good-soft:#173528; --warn:#e3a35a; --warn-soft:#3a2a16; --bad:#e07a7a; --exp:#5d6a85; color-scheme:dark}
+*{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 15px/1.55 var(--f-body);-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--navy)}
+[hidden]{display:none!important}
+.wrap{max-width:620px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2{font-family:var(--f-display);font-weight:500;margin:0;text-wrap:balance}
+.label{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+button,select,input{font:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+a{color:inherit}
+
+/* Masthead */
+.band{background:var(--navy);color:var(--on-navy)}
+.band .wrap{padding-block:16px 24px;display:grid;gap:18px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--on-navy)}
+.brand svg{width:32px;height:32px;flex:none;color:var(--gold);--door:var(--navy)}
+.brand b{font:400 .95rem/1 var(--f-caps);letter-spacing:.22em}
+.who{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--on-navy-muted);min-width:0}
+.who span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40vw}
+.linkbtn{white-space:nowrap}
+.linkbtn{background:none;border:1px solid rgba(230,207,157,.45);color:var(--gold-soft);border-radius:999px;padding:4px 12px;font-size:12.5px;font-weight:600;cursor:pointer}
+.home h1{font-size:30px;line-height:1.15}
+.home p{margin:2px 0 0;color:var(--on-navy-muted);font-size:13.5px}
+.switch{margin-top:8px;background:var(--navy-2);color:var(--on-navy);border:1px solid rgba(230,207,157,.35);border-radius:10px;padding:8px 10px;max-width:100%}
+.hero-num .label{color:var(--on-navy-muted)}
+.hero-num .big{font-family:var(--f-display);font-size:40px;line-height:1.1;color:var(--gold-soft)}
+.hero-num .sub{font-size:13px;color:var(--on-navy-muted)}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--navy-2);border-radius:12px;overflow:hidden}
+.kpi{background:var(--navy);padding:10px 12px;min-width:0}
+.kpi .label{color:var(--on-navy-muted);font-size:10.5px}
+.kpi .v{font-weight:700;font-size:15.5px;margin-top:2px;overflow-wrap:anywhere}
+
+main .wrap{padding-block:20px 40px;display:grid;gap:24px}
+section{display:grid;gap:12px}
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.sec-head h2{font-size:21px}
+.sec-head small{color:var(--muted);font-size:12.5px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.chart svg{display:block;width:100%;height:auto}
+.legend{display:flex;gap:16px;font-size:12.5px;color:var(--muted);margin-top:6px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+
+.months{display:grid;gap:8px}
+.month{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.month>button{all:unset;box-sizing:border-box;cursor:pointer;width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:12px 14px}
+.month>button:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.m-name{font-weight:700;min-width:0}
+.m-name small{display:flex;gap:6px;flex-wrap:wrap;font-weight:500;color:var(--muted);font-size:12.5px;margin-top:2px}
+.m-share{text-align:right;font-weight:700}
+.m-share small{display:block;font-weight:500;color:var(--muted);font-size:11.5px}
+.neg{color:var(--bad)}
+.chev{color:var(--muted);transition:transform .2s;font-size:18px}
+.month.open .chev{transform:rotate(90deg)}
+.m-body{border-top:1px solid var(--line);padding:12px 14px;display:grid;gap:6px;font-size:14px}
+.row{display:flex;justify-content:space-between;gap:12px}
+.row span:first-child{color:var(--muted)}
+.row.total{border-top:1px dashed var(--line);padding-top:6px;font-weight:700}
+.row.total span:first-child{color:var(--fg)}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--good-soft);color:var(--good)}
+.pill.stay{background:var(--warn-soft);color:var(--warn)}
+.more{justify-self:center;background:none;border:1px solid var(--line);color:var(--fg);border-radius:999px;padding:6px 16px;font-weight:600;cursor:pointer}
+
+.stays{display:grid;gap:10px}
+.stay{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.stay:last-of-type{border-bottom:0;padding-bottom:0}
+.stay small{display:block;color:var(--muted);font-size:12.5px}
+.stay span{font-weight:700;color:var(--gold);white-space:nowrap}
+.note{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0}
+.explain{display:flex;gap:12px;align-items:flex-start}
+.explain .dot{flex:none;width:34px;height:34px;border-radius:50%;background:var(--warn-soft);color:var(--gold);display:grid;place-items:center;font-family:var(--f-display);font-size:16px}
+.btn{display:inline-flex;justify-content:center;align-items:center;gap:8px;background:var(--navy);color:var(--on-navy);border:0;border-radius:10px;padding:12px 16px;font-weight:700;cursor:pointer;text-decoration:none}
+.btn.gold{background:var(--gold);color:var(--navy)}
+.foot{font-size:12.5px;color:var(--muted);text-align:center}
+
+/* Sign-in */
+.signin{min-height:80vh;display:grid;align-content:center;padding-block:40px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;display:grid;gap:14px}
+.card .brand{color:var(--fg)}
+.card .brand svg{--door:var(--card)}
+.signin h1{font-size:27px}
+.signin p{margin:0;color:var(--muted)}
+.field{display:grid;gap:6px}
+.field input{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--fg)}
+.msg{border-radius:10px;padding:10px 12px;font-size:14px;background:var(--good-soft);color:var(--good)}
+.msg.err{background:var(--warn-soft);color:var(--warn)}
+.loading{min-height:60vh;display:grid;place-items:center;color:var(--muted)}
+
+/* Report */
+.rep-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.rep-controls label{display:grid;gap:4px;font-size:12.5px;color:var(--muted);font-weight:600}
+.rep-controls select{padding:9px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
+.report{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.rep-head{background:var(--navy);color:var(--on-navy);padding:18px;display:grid;gap:6px}
+.rep-head .label{color:var(--gold-soft)}
+.rep-head h2{font-size:24px}
+.rep-head p{margin:0;color:var(--on-navy-muted);font-size:13.5px}
+.rep-body{padding:16px;display:grid;gap:18px}
+.rep-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.rep-kpi{border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.rep-kpi .v{font-weight:700;font-size:18px}
+.rep-kpi.hl{background:var(--navy);border-color:var(--navy);color:var(--on-navy)}
+.rep-kpi.hl .label{color:var(--gold-soft)}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:520px}
+th,td{padding:8px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+tfoot td{font-weight:700;border-bottom:0;border-top:2px solid var(--fg)}
+.rep-foot{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+
+@media print{
+  body{background:#fff;color:#1a2236}
+  body::before,.no-print,.band,#view-home{display:none!important}
+  #view-report{display:block!important}
+  main .wrap{padding:0;max-width:none}
+  .report{border:0}
+  .rep-head{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .rep-kpi.hl{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  table{min-width:0}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="castle" viewBox="0 0 64 64">
+    <path d="M30.5 6v10" stroke="currentColor" stroke-width="1.6" fill="none"/>
+    <path d="M31.2 6.2l7 2.4-7 2.4z" fill="currentColor"/>
+    <path fill="currentColor" d="M25 16h3v2.5h2V16h3v2.5h2V16h3v10h-13z"/>
+    <path fill="currentColor" d="M14 27h3v2.5h2V27h3v2.5h2V27h2v-1h12v1h2v2.5h2V27h3v2.5h2V27h3v20H14z"/>
+    <path fill="var(--door,#14213a)" d="M28 47v-7a4 4 0 0 1 8 0v7z"/>
+    <rect x="30.2" y="19.5" width="3.6" height="4" rx="1.8" fill="var(--door,#14213a)"/>
+    <path d="M4 51c8-3 14-3 22 0s16 3 34-1" stroke="currentColor" stroke-width="1.6" fill="none"/>
+    <path d="M10 56c7-2 12-2 18 0s13 2 26-1" stroke="currentColor" stroke-width="1.2" fill="none" opacity=".6"/>
+  </symbol>
+</svg>
+
+<!-- Sign-in -->
+<div id="view-signin" hidden>
+  <div class="wrap signin">
+    <div class="card">
+      <a class="brand" href="/"><svg><use href="#castle"/></svg><b>SANDCASTLES</b></a>
+      <h1>Your home's earnings</h1>
+      <p>Enter the email you gave Sandcastles. We'll send you a one-tap sign-in link. No password needed.</p>
+      <form id="signin-form" class="field" novalidate>
+        <label class="label" for="email">Email</label>
+        <input id="email" type="email" required autocomplete="email" inputmode="email" placeholder="you@example.com">
+        <button class="btn" id="signin-btn" type="submit">Send sign-in link</button>
+      </form>
+      <div class="msg" id="signin-msg" role="status" hidden></div>
+      <p class="note">Not with us yet? <a href="/owners/">See what your home could earn</a>.</p>
+    </div>
+  </div>
+</div>
+
+<div id="view-loading" class="loading" hidden>Loading your home…</div>
+
+<!-- Dashboard -->
+<div id="view-app" hidden>
+  <header class="band no-print"><div class="wrap">
+    <div class="top">
+      <a class="brand" href="/"><svg><use href="#castle"/></svg><b>SANDCASTLES</b></a>
+      <div class="who"><span id="who"></span><button class="linkbtn" id="signout" type="button">Sign out</button></div>
+    </div>
+    <div class="home">
+      <h1 id="p-name"></h1>
+      <p id="p-sub"></p>
+      <select class="switch" id="p-switch" aria-label="Choose a home" hidden></select>
+    </div>
+    <div class="hero-num">
+      <div class="label" id="share-label">Your share, all time</div>
+      <div class="big" id="k-owner"></div>
+      <div class="sub" id="k-owner-sub"></div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="label">Revenue</div><div class="v" id="k-rev"></div></div>
+      <div class="kpi"><div class="label">Expenses</div><div class="v" id="k-exp"></div></div>
+      <div class="kpi"><div class="label">Occupancy</div><div class="v" id="k-occ"></div></div>
+    </div>
+  </div></header>
+
+  <main>
+    <div class="wrap" id="view-home">
+      <section>
+        <div class="sec-head"><h2>Last 12 months</h2><small>Revenue and expenses</small></div>
+        <div class="panel chart"><div id="chart"></div>
+          <div class="legend"><span><i style="background:var(--gold)"></i>Revenue</span><span><i style="background:var(--exp)"></i>Expenses</span></div>
+        </div>
+      </section>
+
+      <section>
+        <div class="sec-head"><h2>Month by month</h2><small>Tap a month for details</small></div>
+        <div class="months" id="months"></div>
+        <button class="more" id="more" type="button" hidden>Show earlier months</button>
+      </section>
+
+      <section>
+        <div class="sec-head"><h2>Your stays</h2><small>Dates blocked for you</small></div>
+        <div class="panel stays" id="stays"></div>
+      </section>
+
+      <section>
+        <div class="panel explain">
+          <div class="dot">%</div>
+          <div><b>How occupancy is worked out</b>
+            <p class="note">Guest nights ÷ (days in the month − your stay nights). Your own stays are left out, so a month you spend at home doesn't look like a slow month. <span id="occ-since"></span></p>
+          </div>
+        </div>
+      </section>
+
+      <section class="no-print">
+        <a class="btn gold" href="#report">Create monthly report</a>
+      </section>
+
+      <p class="note">Months follow Airbnb payout dates. Expenses include guest refunds. Owner charges and payments you made to us are kept separately and aren't counted in profit.</p>
+      <p class="foot">Questions? Sandcastles Stays · +91 80727 70364 · aggrohit.aggarwal@gmail.com</p>
+    </div>
+
+    <!-- Report -->
+    <div class="wrap" id="view-report" hidden>
+      <div class="no-print" style="display:grid;gap:12px">
+        <a href="#" class="note" style="text-decoration:none">← Back to dashboard</a>
+        <div class="rep-controls">
+          <label for="r-from">From<select id="r-from"></select></label>
+          <label for="r-to">To<select id="r-to"></select></label>
+          <button class="btn" id="r-print" type="button">Save as PDF</button>
+        </div>
+      </div>
+      <article class="report" id="report"></article>
+    </div>
+  </main>
+</div>
+
+<script>
+// Paste the Apps Script web app URL here after deploying it.
+const API = "";
+
+(function(){
+  const $ = id => document.getElementById(id);
+  const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const MONTH = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const inr = (n, d=0) => (n < 0 ? "−" : "") + "₹" + Math.abs(n).toLocaleString("en-IN",{minimumFractionDigits:d,maximumFractionDigits:d});
+  const pct = x => x == null ? "—" : Math.round(x*100) + "%";
+  const mLabel = (m, long) => (long ? MONTH : MON)[+m.slice(5,7)-1] + " " + m.slice(0,4);
+  const dLabel = d => +d.slice(8,10) + " " + MON[+d.slice(5,7)-1] + " " + d.slice(0,4);
+  const store = {
+    get(){ try { return localStorage.getItem("sc_owner_token"); } catch(e){ return null; } },
+    set(v){ try { localStorage.setItem("sc_owner_token", v); } catch(e){} },
+    clear(){ try { localStorage.removeItem("sc_owner_token"); } catch(e){} }
+  };
+  let DATA = null, P = null, showAll = false, memToken = null;
+
+  function show(view){
+    ["signin","loading","app"].forEach(v => $("view-"+v).hidden = v !== view);
+  }
+
+  // ---------- Sign-in ----------
+  $("signin-form").addEventListener("submit", async e => {
+    e.preventDefault();
+    const email = $("email").value.trim();
+    const msg = $("signin-msg");
+    if (!/^\S+@\S+\.\S+$/.test(email)) { msg.className = "msg err"; msg.textContent = "Enter a full email address, like name@gmail.com."; msg.hidden = false; return; }
+    if (!API) { msg.className = "msg err"; msg.textContent = "Sign-in isn't switched on yet. Please try again shortly."; msg.hidden = false; return; }
+    $("signin-btn").disabled = true; $("signin-btn").textContent = "Sending…";
+    try {
+      const r = await fetch(API + "?action=link&email=" + encodeURIComponent(email));
+      const j = await r.json();
+      msg.className = "msg"; msg.textContent = (j.message || "Check your inbox for the sign-in link.") + " It can take a minute; check spam too.";
+    } catch(err) {
+      msg.className = "msg err"; msg.textContent = "Couldn't reach Sandcastles. Check your connection and try again.";
+    }
+    msg.hidden = false; $("signin-btn").disabled = false; $("signin-btn").textContent = "Send sign-in link";
+  });
+
+  $("signout").addEventListener("click", () => { store.clear(); memToken = null; DATA = null; location.hash = ""; show("signin"); });
+
+  // ---------- Load ----------
+  async function load(){
+    const url = new URL(location.href);
+    const t = url.searchParams.get("t");
+    if (t) { store.set(t); memToken = t; url.searchParams.delete("t"); history.replaceState(null, "", url.pathname + url.hash); }
+    const token = store.get() || memToken;
+    if (!token || !API) { show("signin"); return; }
+    show("loading");
+    try {
+      const r = await fetch(API + "?action=data&token=" + encodeURIComponent(token));
+      const j = await r.json();
+      if (!j.ok) {
+        store.clear(); show("signin");
+        const msg = $("signin-msg"); msg.className = "msg err";
+        msg.textContent = j.error === "expired" ? "Your sign-in link has expired. Enter your email for a new one." : j.error;
+        msg.hidden = false; return;
+      }
+      DATA = j; setup(); show("app"); route();
+    } catch(err) {
+      show("signin");
+      const msg = $("signin-msg"); msg.className = "msg err"; msg.textContent = "Couldn't load your data. Check your connection and refresh.";
+      msg.hidden = false;
+    }
+  }
+
+  function setup(){
+    $("who").textContent = DATA.admin ? "Sandcastles admin" : (DATA.ownerName || DATA.email);
+    const sw = $("p-switch");
+    sw.innerHTML = DATA.properties.map((p,i) => `<option value="${i}">${esc(p.name)}</option>`).join("");
+    sw.hidden = DATA.properties.length < 2;
+    sw.onchange = () => pick(+sw.value);
+    pick(0);
+  }
+
+  function pick(i){
+    P = DATA.properties[i]; showAll = false;
+    renderHome();
+    fillReportControls();
+    if (location.hash === "#report") renderReport();
+  }
+
+  // ---------- Home ----------
+  function totals(ms){
+    const t = ms.reduce((a,m) => { a.rev+=m.revenue; a.exp+=m.expenses; a.pro+=m.profit; a.own+=m.ownerShare; a.sc+=m.sandcastlesShare; a.on+=m.ownerNights;
+      if (m.occupancy != null){ a.g+=m.guestNights; a.av+=m.days-m.ownerNights; a.occM++; } return a; },
+      {rev:0,exp:0,pro:0,own:0,sc:0,on:0,g:0,av:0,occM:0});
+    t.occ = t.occM ? (t.av ? t.g/t.av : null) : null;
+    return t;
+  }
+
+  function renderHome(){
+    const ms = P.months, active = ms.filter(hasData), t = totals(ms);
+    $("p-name").textContent = P.name;
+    $("p-sub").textContent = [P.location, ms.length ? `${mLabel(ms[0].month)} – ${mLabel(ms[ms.length-1].month)}` : ""].filter(Boolean).join(" · ");
+    $("share-label").textContent = `Your share, all time · ${Math.round(P.share*100)}% of profit`;
+    $("k-owner").textContent = inr(t.own);
+    $("k-owner-sub").textContent = active.length ? `Across ${active.length} months · about ${inr(t.own/active.length)} a month` : "";
+    $("k-rev").textContent = inr(t.rev);
+    $("k-exp").textContent = inr(t.exp);
+    const last = [...ms].reverse().find(m => m.occupancy != null);
+    $("k-occ").textContent = last ? `${pct(last.occupancy)} ${MON[+last.month.slice(5,7)-1]}` : "Soon";
+    $("occ-since").textContent = P.calendarConnected ? "" : "Occupancy will show once your Airbnb calendar is connected.";
+    if (P.calendarConnected) {
+      const first = ms.find(m => m.occupancy != null);
+      $("occ-since").textContent = first ? `Calendar data starts ${mLabel(first.month, true)}.` : "";
+    }
+    drawChart(ms.slice(-12));
+    renderMonths();
+    renderStays();
+  }
+
+  function renderMonths(){
+    const list = $("months"); list.innerHTML = "";
+    const ms = [...P.months].reverse();
+    const shown = showAll ? ms : ms.slice(0, 6);
+    shown.forEach((m, i) => {
+      const el = document.createElement("div");
+      el.className = "month";
+      const tags = [];
+      if (m.ownerNights) tags.push(`<span class="pill stay">You stayed ${m.ownerNights} night${m.ownerNights>1?"s":""}</span>`);
+      if (m.occupancy != null) tags.push(`<span class="pill">${pct(m.occupancy)} occupied</span>`);
+      if (!tags.length) tags.push(`Profit ${inr(m.profit)}`);
+      el.innerHTML = `<button aria-expanded="false" id="m-${m.month}">
+        <div class="m-name">${mLabel(m.month, true)}<small>${tags.join("")}</small></div>
+        <div class="m-share ${m.ownerShare<0?"neg":""}">${inr(m.ownerShare)}<small>your share</small></div>
+        <div class="chev" aria-hidden="true">›</div></button>
+        <div class="m-body" hidden>
+          <div class="row"><span>Booking revenue</span><span>${inr(m.revenue,2)}</span></div>
+          <div class="row"><span>Running expenses</span><span>− ${inr(m.expenses,2)}</span></div>
+          <div class="row"><span>Net profit</span><span>${inr(m.profit,2)}</span></div>
+          <div class="row"><span>Sandcastles (${Math.round((1-P.share)*100)}%)</span><span>${inr(m.sandcastlesShare,2)}</span></div>
+          <div class="row total"><span>Your share (${Math.round(P.share*100)}%)</span><span>${inr(m.ownerShare,2)}</span></div>
+          <div class="row"><span>Your stay nights</span><span>${m.ownerNights || "None"}</span></div>
+          <div class="row"><span>Guest nights</span><span>${m.guestNights ?? "—"}</span></div>
+          <div class="row"><span>Occupancy</span><span>${m.occupancy != null ? `${pct(m.occupancy)} (${m.guestNights} of ${m.days - m.ownerNights})` : "Not tracked yet"}</span></div>
+        </div>`;
+      const b = el.querySelector("button"), body = el.querySelector(".m-body");
+      b.addEventListener("click", () => { const o = body.hidden; body.hidden = !o; el.classList.toggle("open", o); b.setAttribute("aria-expanded", o); });
+      list.appendChild(el);
+      if (m.month === (ms.find(hasData) || ms[0]).month) b.click();
+    });
+    $("more").hidden = showAll || ms.length <= 6;
+  }
+  $("more").addEventListener("click", () => { showAll = true; renderMonths(); });
+
+  function renderStays(){
+    const box = $("stays");
+    if (!P.stays.length) { box.innerHTML = `<p class="note">No stays logged yet. When you block dates for yourself, they'll show here.</p>`; return; }
+    box.innerHTML = P.stays.map(s => `<div class="stay"><div><b>${dLabel(s.checkIn)} – ${dLabel(s.checkOut)}</b><small>Check-out on the second date</small></div><span>${s.nights} night${s.nights>1?"s":""}</span></div>`).join("");
+  }
+
+  function drawChart(ms){
+    const box = $("chart");
+    if (!ms.length) { box.innerHTML = `<p class="note">No months yet.</p>`; return; }
+    const W=560,H=230,L=46,R=8,T=12,B=28;
+    const maxV = Math.max(...ms.map(m => Math.max(m.revenue, m.expenses)), 1);
+    const step = niceStep(maxV/4), top = Math.ceil(maxV/step)*step;
+    const iw=W-L-R, ih=H-T-B, gw=iw/ms.length, bw=Math.max(3, Math.min(16, gw*0.32));
+    const y = v => T + ih - v/top*ih;
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Revenue and expenses by month">`;
+    for (let v=0; v<=top+1; v+=step){
+      s += `<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/>`;
+      s += `<text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="10.5" fill="var(--muted)" font-family="Manrope,sans-serif">${v ? "₹"+(v>=1e5?(v/1e5)+"L":(v/1000)+"k") : "0"}</text>`;
+    }
+    ms.forEach((m,i) => {
+      const cx = L + gw*i + gw/2;
+      s += `<rect x="${cx-bw-1}" y="${y(m.revenue)}" width="${bw}" height="${Math.max(0, T+ih-y(m.revenue))}" rx="2" fill="var(--gold)"><title>${mLabel(m.month)}: revenue ${inr(m.revenue)}</title></rect>`;
+      s += `<rect x="${cx+1}" y="${y(m.expenses)}" width="${bw}" height="${Math.max(0, T+ih-y(m.expenses))}" rx="2" fill="var(--exp)"><title>${mLabel(m.month)}: expenses ${inr(m.expenses)}</title></rect>`;
+      if (ms.length <= 12 || i % 2 === 0) s += `<text x="${cx}" y="${H-9}" text-anchor="middle" font-size="10.5" fill="var(--muted)" font-family="Manrope,sans-serif">${MON[+m.month.slice(5,7)-1]}</text>`;
+    });
+    box.innerHTML = s + "</svg>";
+  }
+  function niceStep(x){ const p = Math.pow(10, Math.floor(Math.log10(x))); const f = x/p; return (f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*p; }
+
+  // ---------- Report ----------
+  function fillReportControls(){
+    const opts = P.months.map(m => `<option value="${m.month}">${mLabel(m.month)}</option>`).join("");
+    $("r-from").innerHTML = opts; $("r-to").innerHTML = opts;
+    const n = P.months.length;
+    const lastIdx = (() => { for (let i=n-1;i>=0;i--) if (hasData(P.months[i])) return i; return n-1; })();
+    if (n) { $("r-to").value = P.months[lastIdx].month; $("r-from").value = P.months[Math.max(0, lastIdx-5)].month; }
+  }
+  $("r-from").addEventListener("change", renderReport);
+  $("r-to").addEventListener("change", renderReport);
+  $("r-print").addEventListener("click", () => window.print());
+
+  function renderReport(){
+    let a = $("r-from").value, b = $("r-to").value;
+    if (a > b) [a, b] = [b, a];
+    const ms = P.months.filter(m => m.month >= a && m.month <= b);
+    const t = totals(ms);
+    const start = a + "-01", endM = b;
+    const stays = P.stays.filter(s => s.checkOut > start && s.checkIn.slice(0,7) <= endM);
+    const act = ms.filter(hasData);
+    const best = ms.reduce((x,m) => !x || m.ownerShare > x.ownerShare ? m : x, null);
+    const sharePct = Math.round(P.share*100);
+    $("report").innerHTML = `
+      <div class="rep-head">
+        <div class="label">Owner report</div>
+        <h2>${esc(P.name)}</h2>
+        <p>${esc(P.location || "")}${P.location ? " · " : ""}${mLabel(a, true)} – ${mLabel(b, true)}${P.ownerName ? " · Prepared for " + esc(P.ownerName) : ""}</p>
+      </div>
+      <div class="rep-body">
+        <div class="rep-kpis">
+          <div class="rep-kpi"><div class="label">Total revenue</div><div class="v">${inr(t.rev)}</div></div>
+          <div class="rep-kpi"><div class="label">Running expenses</div><div class="v">${inr(t.exp)}</div></div>
+          <div class="rep-kpi"><div class="label">Profit</div><div class="v">${inr(t.pro)}</div></div>
+          <div class="rep-kpi hl"><div class="label">Owner share (${sharePct}%)</div><div class="v">${inr(t.own)}</div></div>
+          <div class="rep-kpi"><div class="label">Sandcastles (${100-sharePct}%)</div><div class="v">${inr(t.sc)}</div></div>
+          <div class="rep-kpi"><div class="label">Occupancy</div><div class="v">${t.occ != null ? pct(t.occ) : "—"}</div></div>
+        </div>
+        <div class="tbl"><table>
+          <thead><tr><th>Month</th><th>Revenue</th><th>Expenses</th><th>Profit</th><th>Owner share</th><th>Your stay</th><th>Occupancy</th></tr></thead>
+          <tbody>${ms.map(m => `<tr><td>${mLabel(m.month)}</td><td>${inr(m.revenue)}</td><td>${inr(m.expenses)}</td><td>${inr(m.profit)}</td><td>${inr(m.ownerShare)}</td><td>${m.ownerNights ? m.ownerNights + " n" : "—"}</td><td>${pct(m.occupancy)}</td></tr>`).join("")}</tbody>
+          <tfoot><tr><td>Total</td><td>${inr(t.rev)}</td><td>${inr(t.exp)}</td><td>${inr(t.pro)}</td><td>${inr(t.own)}</td><td>${t.on ? t.on + " n" : "—"}</td><td>${t.occ != null ? pct(t.occ) : "—"}</td></tr></tfoot>
+        </table></div>
+        <div>
+          <div class="label" style="margin-bottom:6px">Highlights</div>
+          <p class="note">${act.length ? `Owner share averaged ${inr(t.own/act.length)} a month over ${act.length} month${act.length>1?"s":""}.` : ""}
+          ${best ? ` Best month: ${mLabel(best.month, true)} at ${inr(best.ownerShare)}.` : ""}
+          ${t.rev ? ` Expenses were ${Math.round(t.exp/t.rev*100)}% of revenue.` : ""}
+          ${stays.length ? ` You stayed ${t.on} night${t.on>1?"s":""} in this period; those nights are left out of occupancy.` : ""}</p>
+        </div>
+        <div class="rep-foot">Months follow Airbnb payout dates. Expenses include guest refunds. Profit = revenue − running expenses; owner share is ${sharePct}% of profit.<br>Sandcastles Stays · +91 80727 70364 · aggrohit.aggarwal@gmail.com · sandcastlesstays.com</div>
+      </div>`;
+  }
+
+  function hasData(m){ return m.revenue || m.expenses; }
+
+  function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+  // ---------- Views ----------
+  function route(){
+    if (!DATA) return;
+    const rep = location.hash === "#report";
+    $("view-home").hidden = rep; $("view-report").hidden = !rep;
+    if (rep) renderReport();
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener("hashchange", route);
+  load();
+})();
+</script>
+</body>
+</html>
