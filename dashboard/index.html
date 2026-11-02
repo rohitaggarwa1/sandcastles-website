@@ -333,6 +333,15 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
     <div class="wrap" id="view-rv" hidden>
       <section>
         <div class="tn-sum" id="rv-sum"></div>
+        <div class="tn-price" style="margin-top:10px"><button class="btn gold" id="rv-sync" type="button">Sync now from Airbnb</button></div>
+        <p class="hk-meta" id="rv-status" hidden></p>
+        <details class="tn-more" id="rv-setup"><summary>First time on this computer? Add the sync bookmark</summary>
+          <div class="note" style="display:grid;gap:8px">
+            <p class="note">Works in Chrome on a laptop. Show your bookmarks bar (Ctrl/Cmd + Shift + B), then drag this button onto it:</p>
+            <p><a class="btn" id="rv-bm" href="#" title="Drag me to your bookmarks bar">Sandcastles sync</a></p>
+            <p class="note">After that: tap "Sync now from Airbnb", then click the bookmark in the Airbnb tab that opens. This page updates on its own. The bookmark only reads Airbnb and contains no passwords.</p>
+          </div>
+        </details>
       </section>
       <section>
         <div class="sec-head"><h2>We review the guest</h2><small>Write ours before the window closes</small></div>
@@ -421,6 +430,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
         msg.hidden = false; return;
       }
       DATA = j; setup(); show("app"); route();
+      if (window.opener && DATA.admin) { try { window.opener.postMessage({type: "sc-ready"}, "*"); } catch(e){} }
       history.replaceState(null, "", location.pathname + "?t=" + encodeURIComponent(token) + location.hash);
       setupInstall();
     } catch(err) {
@@ -526,6 +536,31 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
       list.forEach(r => box.appendChild(rvCard(r, today)));
     });
   }
+
+  // On-demand review sync: the bookmark runs in the signed-in Airbnb tab and posts the data back here.
+  const BM_SRC = "(async()=>{var DASH='https://sandcastlesstays.com';\nvar t=document.createElement('div');t.style.cssText='position:fixed;z-index:2147483647;top:16px;right:16px;background:#14284a;color:#fff;padding:12px 16px;border-radius:10px;font:600 14px sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.25)';var say=function(s){t.textContent='Sandcastles: '+s};document.body.appendChild(t);\ntry{if(!/(^|\\.)airbnb\\./.test(location.hostname)){say('open airbnb.co.in/hosting first, then tap this bookmark.');return}\nvar ak=(document.documentElement.innerHTML.match(/\"api_config\":\\{\"key\":\"([^\"]+)\"/)||[])[1];if(!ak){say('sign in to Airbnb first.');return}\nsay('reading reservations…');\nvar N={\"1808660277697173230\":\"4-205 Tata\",\"1621848695868234147\":\"Adora Cabana 18B-301\",\"1775831973911785734\":\"A N A N T 15A-406\",\"1620819206718571226\":\"Casa Lang 11-203\",\"1628813943680058635\":\"Casa Robo 1-903\",\"1606425911548303262\":\"Casa Rubra 2-705\",\"1393221962450225492\":\"Cozy & Serene 6-401\",\"41844284\":\"Oceania 3-803\",\"1513129553820654329\":\"RoDee Casa 6-704\",\"1808100367006540902\":\"Rivermist 8-507\",\"1753390048719457262\":\"Studio Nesto 3-306\",\"1137370569468403227\":\"Teal Costa 6-102\",\"1732454109326961451\":\"Zula Azul 3-704\",\"1734832194188995408\":\"Casa Sereno Madgaon\",\"1228337197220113744\":\"White House 4BHK\",\"1228335428027829504\":\"White House · Blue room\",\"1228324784737419403\":\"White House · Green room\",\"1228332150891129403\":\"White House · Red room\",\"1228338849851342645\":\"White House · Violet room\",\"1084844544875041849\":\"Corner House 3BHK\",\"1234634311146305320\":\"Corner House · Breezy room\",\"885310383146864691\":\"Corner House · Cozy room\",\"885387732231158043\":\"Corner House · Attic room\",\"1485665764163881676\":\"Malgudi House\",\"1655832645721461711\":\"Greendale 3BHK\",\"1655866296618353043\":\"Silverdale 2BHK\",\"1411498650468587712\":\"Private Garden 2BHK\",\"1655980256789703610\":\"Urban Nook 101\",\"1655974485091775929\":\"Urban Nook 102\",\"1655967862491698911\":\"Urban Nook · Cozy 1–1.5BHK\",\"1655915072388339092\":\"Urban Nook 202\",\"1655898966921201666\":\"Urban Nook 301\",\"1614227655910227949\":\"Canvas Abode\",\"1647893703254378405\":\"Thresya Villa\"};\nvar ist=function(d){return new Date(d.getTime()+19800000).toISOString().slice(0,10)};var add=function(d,n){var x=new Date(d+'T00:00:00Z');x.setUTCDate(x.getUTCDate()+n);return x.toISOString().slice(0,10)};\nvar today=ist(new Date()),min=add(today,-16),all=[];\nfor(var off=0;off<600;off+=40){var j=await fetch('/api/v2/reservations?_format=for_remy&_limit=40&_offset='+off+'&collection_strategy=for_reservations_list&date_min='+min+'&date_max='+add(today,90)+'&status=accepted&key='+ak+'&currency=INR&locale=en-IN',{headers:{'X-Airbnb-API-Key':ak}}).then(function(r){return r.json()});var rs=j.reservations||[];all=all.concat(rs);if(rs.length<40)break}\nvar phones=[],rows=[],seen={};\nall.forEach(function(r){var g=r.guest_user||{};if(g.phone&&r.end_date>=today)phones.push([r.confirmation_code,g.full_name||g.first_name||'',g.phone,r.end_date])});\nall.forEach(function(r){var s=r.user_facing_status_localized||'';var k=/^Review guest/i.test(s)?'host':/Awaiting guest review/i.test(s)?'guest':null;if(!k||seen[r.confirmation_code]||r.end_date>today)return;var dl=add(r.end_date,14);if(dl<today)return;seen[r.confirmation_code]=1;var g=r.guest_user||{};var lid=String(r.listing_id_str||r.listing_id);\nrows.push([k,N[lid]||String(r.listing_name||'').replace(/^\\d+\\s*-\\s*/,'').split(/ [·|] /)[0],g.full_name||g.first_name||'',g.phone||'',r.end_date,dl,r.confirmation_code,'https://www.airbnb.co.in/hosting/reservations/details/'+r.confirmation_code,s,lid])});\nvar msg={type:'sc-reviews',rows:rows,phones:phones};\nvar w=window.opener&&!window.opener.closed?window.opener:null;\nif(w){w.postMessage(msg,DASH);say('sent '+rows.length+' reviews to the dashboard tab ✓');}\nelse{w=window.open(DASH+'/dashboard/#reviews','sc_dash');addEventListener('message',function h(e){if(e.origin===DASH&&e.data&&e.data.type==='sc-ready'){w.postMessage(msg,DASH);removeEventListener('message',h);say('sent '+rows.length+' reviews to the dashboard ✓')}});say('opening the dashboard…')}\nsetTimeout(function(){t.remove()},8000)}catch(e){say('sync failed – '+e)}})();";
+  $("rv-bm").href = "javascript:" + encodeURIComponent(BM_SRC);
+  $("rv-bm").addEventListener("click", e => { e.preventDefault(); rvStatus("Drag this button to your bookmarks bar instead of clicking it."); });
+  function rvStatus(t){ const el = $("rv-status"); el.textContent = t; el.hidden = !t; }
+  $("rv-sync").addEventListener("click", () => {
+    window.open("https://www.airbnb.co.in/hosting", "sc_airbnb");
+    rvStatus("In the Airbnb tab, click your \"Sandcastles sync\" bookmark. This page will update on its own.");
+  });
+  window.addEventListener("message", async e => {
+    if (!/^https:\/\/(www\.)?airbnb\.(co\.in|com)$/.test(e.origin)) return;
+    const d = e.data;
+    if (!d || d.type !== "sc-reviews" || !DATA || !DATA.admin || !Array.isArray(d.rows)) return;
+    rvStatus("Saving " + d.rows.length + " reviews…");
+    try {
+      const tok = store.get() || memToken;
+      const res = await fetch(API, {method: "POST", body: JSON.stringify({action: "importReviews", token: tok, rows: d.rows, phones: d.phones || []})}).then(r => r.json());
+      if (!res.ok) throw new Error(res.error || "failed");
+      const j = await fetch(API + "?action=data&token=" + encodeURIComponent(tok)).then(r => r.json());
+      if (j.ok) DATA.reviews = j.reviews;
+      if (location.hash === "#reviews") renderReviews();
+      rvStatus(`Synced just now: ${res.imported} pending review${res.imported === 1 ? "" : "s"}, ${res.phonesSaved} phone number${res.phonesSaved === 1 ? "" : "s"} on file.`);
+    } catch(err) { rvStatus("Couldn't save the sync: " + err.message); }
+  });
 
   // ---------- Tonight board ----------
   let TN = null, tnLoading = false;
