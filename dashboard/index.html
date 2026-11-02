@@ -323,7 +323,7 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
         <div id="hk-events" style="display:grid;gap:14px"></div>
       </section>
       <section>
-        <div class="sec-head"><h2>Staff and payments</h2><small id="hk-month"></small></div>
+        <div class="sec-head"><h2 id="hk-staff-h">Staff and payments</h2><small id="hk-month"></small></div>
         <div class="staff" id="hk-staff"></div>
         <p class="note">Payments are expenses with words like salary, maid, housekeeping or cleaning in the details. Add names, phones and monthly pay in the Staff tab of the sheet.</p>
       </section>
@@ -430,7 +430,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
         msg.hidden = false; return;
       }
       DATA = j; setup(); show("app"); route();
-      if (window.opener && DATA.admin) { try { window.opener.postMessage({type: "sc-ready"}, "*"); } catch(e){} }
+      if (window.opener && (DATA.admin || DATA.team)) { try { window.opener.postMessage({type: "sc-ready"}, "*"); } catch(e){} }
       history.replaceState(null, "", location.pathname + "?t=" + encodeURIComponent(token) + location.hash);
       setupInstall();
     } catch(err) {
@@ -441,12 +441,14 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
   }
 
   function setup(){
-    $("who").textContent = DATA.admin ? "Sandcastles admin" : (DATA.ownerName || DATA.email);
+    $("who").textContent = DATA.admin ? "Sandcastles admin" : DATA.team ? "Sandcastles team" : (DATA.ownerName || DATA.email);
     const sw = $("p-switch");
     sw.innerHTML = DATA.properties.map((p,i) => `<option value="${i}">${esc(p.name)}</option>`).join("");
     sw.hidden = DATA.properties.length < 2;
     sw.onchange = () => pick(+sw.value);
-    $("admin-tabs").hidden = !(DATA.admin && DATA.housekeeping);
+    $("admin-tabs").hidden = !DATA.housekeeping;
+    $("tab-homes").hidden = !DATA.properties.length;
+    if (!DATA.properties.length) { if (!/^#(housekeeping|reviews)$/.test(location.hash)) history.replaceState(null, "", location.pathname + location.search + "#housekeeping"); return; }
     pick(0);
   }
 
@@ -469,7 +471,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
   function renderHK(){
     const H = DATA.housekeeping; if (!H) return;
     $("p-name").textContent = "Housekeeping";
-    $("p-sub").textContent = `${DATA.properties.length} homes · ${dayName(H.from, H.today)} to ${dayName(H.to, H.today)}`;
+    $("p-sub").textContent = `${DATA.properties.length ? DATA.properties.length + " homes" : "All homes"} · ${dayName(H.from, H.today)} to ${dayName(H.to, H.today)}`;
     const outs = H.events.filter(e => e.kind === "out");
     const pending = outs.filter(e => !e.cleaned && e.date <= H.today);
     const todayOut = outs.filter(e => e.date === H.today).length;
@@ -491,9 +493,11 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
       box.appendChild(wrap);
     });
     $("hk-month").textContent = mLabel(H.month, true);
+    const teamView = !DATA.admin; $("hk-staff-h").textContent = teamView ? "Staff" : "Staff and payments"; $("hk-staff").nextElementSibling.hidden = teamView;
     const st = $("hk-staff");
-    st.innerHTML = H.staff.length ? "" : `<p class="note">No staff or staff payments found yet.</p>`;
-    H.staff.forEach(h => {
+    const staffList = H.staff.filter(h => !h.hidePay || h.staff.some(x => x.name));
+    st.innerHTML = staffList.length ? "" : `<p class="note">No staff added yet.</p>`;
+    staffList.forEach(h => {
       const el = document.createElement("div"); el.className = "panel";
       let status;
       if (h.expected && h.paidThisMonth >= h.expected) status = `<span class="pill">Paid this month</span>`;
@@ -501,6 +505,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
       else status = `<span class="pill muted">Not paid yet this month</span>`;
       const people = h.staff.filter(s => s.name || s.role).map(s =>
         `${esc(s.name || "Name not added")}${s.role ? " · " + esc(s.role) : ""}${s.phone ? ` · <a href="tel:${esc(s.phone.replace(/\s/g,""))}">${esc(s.phone)}</a>` : ""}${s.pay ? " · " + inr(s.pay) + "/month" : ""}${s.payDay ? " · pay day " + esc(s.payDay) : ""}`).join("<br>");
+      if (h.hidePay) { el.innerHTML = `<div class="hk-top"><b>${esc(h.property)}</b></div><div class="who-row" style="margin:6px 0">${people}</div>`; st.appendChild(el); return; }
       el.innerHTML = `<div class="hk-top"><b>${esc(h.property)}</b>${status}</div>
         <div class="who-row" style="margin:6px 0">${people || "No staff added in the sheet yet"}</div>
         <div class="row"><span>Expected each month</span><span>${h.expected ? inr(h.expected) : "—"}</span></div>
@@ -549,7 +554,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
   window.addEventListener("message", async e => {
     if (!/^https:\/\/(www\.)?airbnb\.(co\.in|com)$/.test(e.origin)) return;
     const d = e.data;
-    if (!d || d.type !== "sc-reviews" || !DATA || !DATA.admin || !Array.isArray(d.rows)) return;
+    if (!d || d.type !== "sc-reviews" || !DATA || !(DATA.admin || DATA.team) || !Array.isArray(d.rows)) return;
     rvStatus("Saving " + d.rows.length + " reviews…");
     try {
       const tok = store.get() || memToken;
@@ -845,8 +850,9 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
   // ---------- Views ----------
   function route(){
     if (!DATA) return;
-    const hk = location.hash === "#housekeeping" && DATA.admin && DATA.housekeeping;
-    const rv = location.hash === "#reviews" && DATA.admin && !!DATA.reviews;
+    const opsOnly = !DATA.properties.length;
+    const hk = !!DATA.housekeeping && (location.hash === "#housekeeping" || (opsOnly && location.hash !== "#reviews"));
+    const rv = !hk && location.hash === "#reviews" && !!DATA.reviews;
     const ops = hk || rv;
     const rep = !ops && location.hash === "#report";
     $("view-home").hidden = rep || ops; $("view-report").hidden = !rep; $("view-hk").hidden = !hk; $("view-rv").hidden = !rv;
