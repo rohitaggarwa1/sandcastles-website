@@ -187,7 +187,7 @@ tfoot td{font-weight:700;border-bottom:0;border-top:2px solid var(--fg)}
   table{min-width:0}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
-.tabs{display:flex;gap:6px;margin-top:12px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
 .tabs a{color:var(--gold-soft);text-decoration:none;font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px;border:1px solid rgba(230,207,157,.35)}
 .tabs a.on{background:var(--gold);color:var(--navy);border-color:var(--gold)}
 .pill.warn{background:var(--warn-soft);color:var(--warn)}
@@ -239,6 +239,12 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
 .neg-form select,.neg-form input{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;font-size:13.5px;background:var(--bg);color:var(--fg)}
 .neg-form input{flex:1 1 160px;min-width:0}
 .neg-form .btn{padding:8px 12px;font-size:13px}
+.lead-form{display:grid;gap:8px}
+.lead-form .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.lead-form input,.lead-form select,.lead-form textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:8px;padding:9px 10px;font:inherit;font-size:14px;background:var(--bg);color:var(--fg)}
+.lead-form textarea{min-height:70px;resize:vertical}
+.lead-form label{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:grid;gap:4px}
+.lead-notes{font-size:13.5px;line-height:1.5;white-space:pre-wrap;margin:0;color:var(--fg)}
 </style>
 </head>
 <body>
@@ -306,7 +312,7 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
       <h1 id="p-name"></h1>
       <p id="p-sub"></p>
       <select class="switch" id="p-switch" aria-label="Choose a home" hidden></select>
-      <nav class="tabs" id="admin-tabs" hidden><a href="#" id="tab-homes">Homes</a><a href="#housekeeping" id="tab-hk">Housekeeping</a><a href="#reviews" id="tab-rv">Reviews</a><a href="#info" id="tab-info">Info</a></nav>
+      <nav class="tabs" id="admin-tabs" hidden><a href="#homes" id="tab-homes">Homes</a><a href="#housekeeping" id="tab-hk">Housekeeping</a><a href="#reviews" id="tab-rv">Reviews</a><a href="#info" id="tab-info">Info</a><a href="#owners" id="tab-ow">Owners</a></nav>
     </div>
     <div class="hero-num" id="hero">
       <div class="label" id="share-label">Your share, all time</div>
@@ -405,6 +411,18 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
         <div class="staff" id="hk-staff"></div>
         <p class="note">Payments are expenses with words like salary, maid, housekeeping or cleaning in the details. Add names, phones and monthly pay in the Staff tab of the sheet.</p>
       </section>
+    </div>
+
+    <!-- Owner outreach (team only) -->
+    <div class="wrap" id="view-ow" hidden>
+      <section>
+        <div class="tn-sum" id="ow-sum"></div>
+        <details class="panel" id="ow-add" style="margin-top:12px"><summary style="cursor:pointer;font-weight:700">+ Add owner</summary><div id="ow-add-form" style="margin-top:12px"></div></details>
+        <div class="neg-filter" id="ow-filter" style="margin-top:12px"></div>
+        <div id="ow-list" style="display:grid;gap:8px;margin-top:10px"></div>
+        <p class="note">Saved to the "Owner Leads" tab of the sheet. Follow-ups that are due or overdue are highlighted.</p>
+      </section>
+      <datalist id="ow-sources"><option value="Referral"><option value="Society visit"><option value="Bank"><option value="Instagram"><option value="Website"><option value="Pamphlet"><option value="Walk-in"></datalist>
     </div>
 
     <!-- Property info (team only) -->
@@ -550,7 +568,8 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
     sw.onchange = () => pick(+sw.value);
     $("admin-tabs").hidden = !DATA.housekeeping;
     $("tab-homes").hidden = !DATA.properties.length;
-    if (!DATA.properties.length) { if (!/^#(housekeeping|reviews|info)$/.test(location.hash)) history.replaceState(null, "", location.pathname + location.search + "#housekeeping"); return; }
+    if (DATA.admin && DATA.housekeeping && !location.hash) history.replaceState(null, "", location.pathname + location.search + "#housekeeping");
+    if (!DATA.properties.length) { if (!/^#(housekeeping|reviews|info|owners)$/.test(location.hash)) history.replaceState(null, "", location.pathname + location.search + "#housekeeping"); return; }
     pick(0);
   }
 
@@ -741,6 +760,70 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
       rvStatus(`Synced just now: ${res.imported} pending review${res.imported === 1 ? "" : "s"}, ${res.phonesSaved} phone number${res.phonesSaved === 1 ? "" : "s"} on file.`);
     } catch(err) { rvStatus("Couldn't save the sync: " + err.message); }
   });
+
+  // ---------- Owner outreach ----------
+  let owFilter = "active";
+  const OW_DONE = ["Onboarded", "Not interested"];
+  function leadForm(l, onSaved){
+    const f = document.createElement("form"); f.className = "lead-form";
+    const L = DATA.leads, team = [...new Set(teamList().map(p => p.name).concat(["Rohit", "Deepika", "Sunil"]))];
+    f.innerHTML = `<label>Owner name *<input name="name" required value="${esc(l?.name || "")}" autocomplete="off"></label>
+      <div class="two"><label>Phone<input name="phone" inputmode="tel" value="${esc(l?.phone || "")}" autocomplete="off"></label><label>Email<input name="email" type="email" value="${esc(l?.email || "")}" autocomplete="off"></label></div>
+      <label>Property / location<input name="property" placeholder="e.g. 12-803 RDG, Dabolim" value="${esc(l?.property || "")}" autocomplete="off"></label>
+      <div class="two"><label>Size<select name="size">${["", "Studio", "1BHK", "2BHK", "3BHK", "4BHK+", "Villa", "Room"].map(x => `<option${x === (l?.size || "") ? " selected" : ""} value="${x}">${x || "—"}</option>`).join("")}</select></label><label>Source<input name="source" list="ow-sources" value="${esc(l?.source || "")}" autocomplete="off"></label></div>
+      <div class="two"><label>Status<select name="status">${L.statuses.map(x => `<option${x === (l?.status || "New") ? " selected" : ""}>${esc(x)}</option>`).join("")}</select></label><label>Next follow-up<input name="followUp" type="date" value="${esc(l?.followUp || "")}"></label></div>
+      <label>Handled by<input name="owner" list="ow-team" value="${esc(l?.owner || "")}" autocomplete="off"></label>
+      <datalist id="ow-team">${team.map(n => `<option value="${esc(n)}">`).join("")}</datalist>
+      <label>Notes<textarea name="notes" placeholder="What they want, rent expectations, setup needed…">${esc(l?.notes || "")}</textarea></label>
+      <div class="neg-form"><button class="btn gold" type="submit">${l ? "Save changes" : "Add owner"}</button>${l ? `<button class="small-btn" type="button" data-del>Delete</button>` : ""}<span class="hk-meta" data-msg></span></div>`;
+    f.addEventListener("submit", async ev => {
+      ev.preventDefault(); const b = f.querySelector("[type=submit]"), msg = f.querySelector("[data-msg]"); b.disabled = true; msg.textContent = "Saving…";
+      const q = new URLSearchParams({action: "lead", token: store.get() || memToken, id: l?.id || ""});
+      ["name", "phone", "email", "property", "size", "source", "status", "followUp", "owner", "notes"].forEach(k => q.set(k, f[k].value));
+      try {
+        const j = await fetch(API + "?" + q).then(r => r.json()); if (!j.ok) throw new Error(j.error);
+        const i = L.items.findIndex(x => x.id === j.lead.id); if (i > -1) L.items[i] = j.lead; else L.items.push(j.lead);
+        onSaved && onSaved(); renderOwners();
+      } catch(err) { b.disabled = false; msg.textContent = err.message || "Couldn't save. Try again."; }
+    });
+    const d = f.querySelector("[data-del]");
+    if (d) d.addEventListener("click", async () => {
+      if (d.dataset.sure !== "1") { d.dataset.sure = "1"; d.textContent = "Tap again to delete"; return; }
+      d.disabled = true;
+      try { const j = await fetch(API + "?" + new URLSearchParams({action: "lead", token: store.get() || memToken, id: l.id, del: "1"})).then(r => r.json()); if (!j.ok) throw new Error(j.error);
+        L.items = L.items.filter(x => x.id !== l.id); renderOwners(); } catch(err) { d.disabled = false; d.textContent = "Try again"; }
+    });
+    return f;
+  }
+  function renderOwners(){
+    const L = DATA.leads, today = (DATA.housekeeping && DATA.housekeeping.today) || new Date().toISOString().slice(0, 10);
+    $("p-name").textContent = "Owner outreach"; $("p-sub").textContent = "New homes to bring on board";
+    const counts = {}; L.items.forEach(x => counts[x.status] = (counts[x.status] || 0) + 1);
+    const due = L.items.filter(x => !OW_DONE.includes(x.status) && x.followUp && x.followUp <= today).length;
+    $("ow-sum").innerHTML = `<span class="pill muted">${L.items.filter(x => !OW_DONE.includes(x.status)).length} in progress</span>${due ? `<span class="pill warn">${due} follow-up${due > 1 ? "s" : ""} due</span>` : ""}<span class="pill">${counts["Onboarded"] || 0} onboarded</span>`;
+    const addBox = $("ow-add-form"); addBox.innerHTML = ""; addBox.appendChild(leadForm(null, () => { $("ow-add").open = false; }));
+    if (!L.items.length) $("ow-add").open = true;
+    $("ow-filter").innerHTML = [["active", "In progress"], ["done", "Done"], ["all", "All"]].map(([k, t]) => `<button type="button" data-f="${k}" class="${k === owFilter ? "on" : ""}">${t}</button>`).join("");
+    const list = $("ow-list"); list.innerHTML = "";
+    const shown = L.items.filter(x => owFilter === "all" || (owFilter === "done") === OW_DONE.includes(x.status))
+      .sort((a, b) => (a.followUp || "9999") < (b.followUp || "9999") ? -1 : (a.followUp || "9999") > (b.followUp || "9999") ? 1 : (a.added < b.added ? 1 : -1));
+    if (!shown.length) list.innerHTML = `<p class="note">${L.items.length ? "Nothing here." : "No owners added yet. Use + Add owner above."}</p>`;
+    shown.forEach(l => {
+      const el = document.createElement("div");
+      const isDue = !OW_DONE.includes(l.status) && l.followUp && l.followUp <= today;
+      el.className = "hk" + (isDue ? " late" : "") + (OW_DONE.includes(l.status) ? " done" : "");
+      const tel = (l.phone || "").replace(/[^0-9+]/g, ""), wa = tel.replace(/^\+/, "").replace(/^(\d{10})$/, "91$1");
+      el.innerHTML = `<div class="hk-top"><b>${esc(l.name)}</b><span class="pill ${l.status === "Onboarded" ? "" : l.status === "Not interested" ? "muted" : "warn"}">${esc(l.status)}</span></div>
+        <div class="hk-meta">${[l.property, l.size, l.source && "via " + l.source].filter(Boolean).map(esc).join(" · ") || "No property details yet"}</div>
+        <div class="hk-meta">${tel ? `<a href="tel:${esc(tel)}">${esc(l.phone)}</a> · <a href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a>` : "No phone"}${l.email ? ` · <a href="mailto:${esc(l.email)}">${esc(l.email)}</a>` : ""}</div>
+        <div class="hk-meta">${l.followUp ? `Follow up ${dayName(l.followUp, today)}` : "No follow-up set"}${l.owner ? " · " + esc(l.owner) : ""} · added ${esc(l.added)}</div>
+        ${l.notes ? `<p class="lead-notes">${esc(l.notes)}</p>` : ""}
+        <button class="small-btn" type="button" data-edit>Edit</button>`;
+      el.querySelector("[data-edit]").addEventListener("click", ev => { ev.target.replaceWith(leadForm(l)); });
+      list.appendChild(el);
+    });
+  }
+  $("ow-filter").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if (b) { owFilter = b.dataset.f; renderOwners(); } });
 
   // ---------- Property info ----------
   let INFO = null, infoLoading = false;
@@ -1142,16 +1225,18 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
   function route(){
     if (!DATA) return;
     const opsOnly = !DATA.properties.length;
-    const hk = !!DATA.housekeeping && (location.hash === "#housekeeping" || (opsOnly && !/^#(reviews|info)$/.test(location.hash)));
+    const hk = !!DATA.housekeeping && (location.hash === "#housekeeping" || (opsOnly && !/^#(reviews|info|owners)$/.test(location.hash)));
     const rv = !hk && location.hash === "#reviews" && !!DATA.reviews;
     const info = !hk && !rv && location.hash === "#info" && !!DATA.housekeeping;
-    const ops = hk || rv || info;
+    const ow = !hk && !rv && !info && location.hash === "#owners" && !!DATA.leads;
+    const ops = hk || rv || info || ow;
     const rep = !ops && location.hash === "#report";
-    $("view-home").hidden = rep || ops; $("view-report").hidden = !rep; $("view-hk").hidden = !hk; $("view-rv").hidden = !rv; $("view-info").hidden = !info;
+    $("view-home").hidden = rep || ops; $("view-report").hidden = !rep; $("view-hk").hidden = !hk; $("view-rv").hidden = !rv; $("view-info").hidden = !info; $("view-ow").hidden = !ow;
     $("hero").hidden = ops; $("kpis").hidden = ops; $("p-switch").hidden = ops || DATA.properties.length < 2;
-    $("tab-homes").classList.toggle("on", !ops); $("tab-hk").classList.toggle("on", !!hk); $("tab-rv").classList.toggle("on", !!rv); $("tab-info").classList.toggle("on", !!info);
+    $("tab-homes").classList.toggle("on", !ops); $("tab-hk").classList.toggle("on", !!hk); $("tab-rv").classList.toggle("on", !!rv); $("tab-info").classList.toggle("on", !!info); $("tab-ow").classList.toggle("on", !!ow); $("tab-ow").hidden = !DATA.leads;
     if (hk) { renderHK(); loadTonight(false); }
     if (rv) renderReviews();
+    if (ow) renderOwners();
     if (info) { $("p-name").textContent = "Property info"; $("p-sub").textContent = "Codes, Wi-Fi and parking for every home"; loadInfo(false); }
     if (!ops && P) { const n = $("p-name"); if (n.textContent !== P.name) renderHome(); }
     if (rep) renderReport();
