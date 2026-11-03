@@ -245,6 +245,8 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
 .lead-form textarea{min-height:70px;resize:vertical}
 .lead-form label{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:grid;gap:4px}
 .lead-notes{font-size:13.5px;line-height:1.5;white-space:pre-wrap;margin:0;color:var(--fg)}
+.pill.late{background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad)}
+.svc-home{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 0 2px}
 </style>
 </head>
 <body>
@@ -312,7 +314,7 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
       <h1 id="p-name"></h1>
       <p id="p-sub"></p>
       <select class="switch" id="p-switch" aria-label="Choose a home" hidden></select>
-      <nav class="tabs" id="admin-tabs" hidden><a href="#homes" id="tab-homes">Homes</a><a href="#housekeeping" id="tab-hk">Housekeeping</a><a href="#reviews" id="tab-rv">Reviews</a><a href="#info" id="tab-info">Info</a><a href="#owners" id="tab-ow">Owners</a></nav>
+      <nav class="tabs" id="admin-tabs" hidden><a href="#homes" id="tab-homes">Homes</a><a href="#housekeeping" id="tab-hk">Housekeeping</a><a href="#reviews" id="tab-rv">Reviews</a><a href="#info" id="tab-info">Info</a><a href="#owners" id="tab-ow">Owners</a><a href="#service" id="tab-svc">Service</a></nav>
     </div>
     <div class="hero-num" id="hero">
       <div class="label" id="share-label">Your share, all time</div>
@@ -411,6 +413,18 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
         <div class="staff" id="hk-staff"></div>
         <p class="note">Payments are expenses with words like salary, maid, housekeeping or cleaning in the details. Add names, phones and monthly pay in the Staff tab of the sheet.</p>
       </section>
+    </div>
+
+    <!-- Appliance service (team only) -->
+    <div class="wrap" id="view-svc" hidden>
+      <section>
+        <div class="tn-sum" id="svc-sum"></div>
+        <details class="panel" id="svc-add" style="margin-top:12px"><summary style="cursor:pointer;font-weight:700">+ Add purifier or AC</summary><div id="svc-add-form" style="margin-top:12px"></div></details>
+        <div class="neg-filter" id="svc-filter" style="margin-top:12px"></div>
+        <div id="svc-list" style="display:grid;gap:8px;margin-top:6px"></div>
+        <p class="note">Saved to the "Service" tab of the sheet; every service date is also logged in "Service History". Due soon = within 15 days.</p>
+      </section>
+      <datalist id="svc-homes"></datalist>
     </div>
 
     <!-- Owner outreach (team only) -->
@@ -569,7 +583,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
     $("admin-tabs").hidden = !DATA.housekeeping;
     $("tab-homes").hidden = !DATA.properties.length;
     if (DATA.admin && DATA.housekeeping && !location.hash) history.replaceState(null, "", location.pathname + location.search + "#housekeeping");
-    if (!DATA.properties.length) { if (!/^#(housekeeping|reviews|info|owners)$/.test(location.hash)) history.replaceState(null, "", location.pathname + location.search + "#housekeeping"); return; }
+    if (!DATA.properties.length) { if (!/^#(housekeeping|reviews|info|owners|service)$/.test(location.hash)) history.replaceState(null, "", location.pathname + location.search + "#housekeeping"); return; }
     pick(0);
   }
 
@@ -760,6 +774,81 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
       rvStatus(`Synced just now: ${res.imported} pending review${res.imported === 1 ? "" : "s"}, ${res.phonesSaved} phone number${res.phonesSaved === 1 ? "" : "s"} on file.`);
     } catch(err) { rvStatus("Couldn't save the sync: " + err.message); }
   });
+
+  // ---------- Appliance service ----------
+  let svcFilter = "due";
+  function addMonths(d, n){ const t = new Date(d + "T00:00:00Z"), day = t.getUTCDate(); t.setUTCDate(1); t.setUTCMonth(t.getUTCMonth() + n); t.setUTCDate(Math.min(day, new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth() + 1, 0)).getUTCDate())); return t.toISOString().slice(0, 10); }
+  function svcToday(){ return (DATA.housekeeping && DATA.housekeeping.today) || new Date().toISOString().slice(0, 10); }
+  function svcState(x){
+    if (!x.last) return {k: "never", due: null, label: "No service logged", cls: "warn"};
+    const due = addMonths(x.last, x.months), t = svcToday(), days = Math.round((Date.parse(due) - Date.parse(t)) / 864e5);
+    if (days < 0) return {k: "over", due, days, label: `Overdue ${-days} day${days === -1 ? "" : "s"}`, cls: "late"};
+    if (days <= 15) return {k: "soon", due, days, label: days === 0 ? "Due today" : `Due in ${days} day${days === 1 ? "" : "s"}`, cls: "warn"};
+    return {k: "ok", due, days, label: "OK", cls: ""};
+  }
+  function svcForm(x, opts){
+    const S = DATA.service, f = document.createElement("form"); f.className = "lead-form";
+    const type = x?.type || "AC";
+    f.innerHTML = `<label>Home *<input name="home" list="svc-homes" required value="${esc(x?.home || "")}" autocomplete="off" placeholder="Pick or type the home"></label>
+      <div class="two"><label>Appliance<select name="type">${S.types.map(t => `<option${t === type ? " selected" : ""}>${esc(t)}</option>`).join("")}</select></label><label>Unit / room<input name="unit" value="${esc(x?.unit || "")}" placeholder="e.g. Master bedroom, Kitchen" autocomplete="off"></label></div>
+      <div class="two"><label>Last service<input name="last" type="date" value="${esc(opts?.today ? svcToday() : (x?.last || ""))}"></label><label>Every (months)<input name="months" type="number" min="1" max="24" value="${esc(x?.months || S.defaults[type] || 6)}"></label></div>
+      <div class="two"><label>Vendor<input name="vendor" value="${esc(x?.vendor || "")}" autocomplete="off" placeholder="e.g. Kent, Urban Company"></label><label>Vendor phone<input name="vendorPhone" inputmode="tel" value="${esc(x?.vendorPhone || "")}" autocomplete="off"></label></div>
+      <div class="two"><label>Cost (₹)<input name="cost" inputmode="decimal" value="${esc(opts?.today ? "" : (x?.cost || ""))}" autocomplete="off"></label><span></span></div>
+      <label>Notes<textarea name="notes" placeholder="Filter changed, gas top-up, AMC till…">${esc(x?.notes || "")}</textarea></label>
+      <div class="neg-form"><button class="btn gold" type="submit">${x ? "Save" : "Add"}</button>${x ? `<button class="small-btn" type="button" data-del>Delete</button>` : ""}<span class="hk-meta" data-msg></span></div>`;
+    if (!x) f.type.addEventListener("change", () => { f.months.value = S.defaults[f.type.value] || 6; });
+    f.addEventListener("submit", async ev => {
+      ev.preventDefault(); const b = f.querySelector("[type=submit]"), msg = f.querySelector("[data-msg]"); b.disabled = true; msg.textContent = "Saving…";
+      const q = new URLSearchParams({action: "service", token: store.get() || memToken, id: x?.id || ""});
+      ["home", "type", "unit", "last", "months", "vendor", "vendorPhone", "cost", "notes"].forEach(k => q.set(k, f[k].value));
+      try {
+        const j = await fetch(API + "?" + q).then(r => r.json()); if (!j.ok) throw new Error(j.error);
+        const i = S.items.findIndex(y => y.id === j.item.id); if (i > -1) S.items[i] = j.item; else S.items.push(j.item);
+        if (!x) $("svc-add").open = false; renderService();
+      } catch(err) { b.disabled = false; msg.textContent = err.message || "Couldn't save. Try again."; }
+    });
+    const d = f.querySelector("[data-del]");
+    if (d) d.addEventListener("click", async () => {
+      if (d.dataset.sure !== "1") { d.dataset.sure = "1"; d.textContent = "Tap again to delete"; return; }
+      d.disabled = true;
+      try { const j = await fetch(API + "?" + new URLSearchParams({action: "service", token: store.get() || memToken, id: x.id, del: "1"})).then(r => r.json()); if (!j.ok) throw new Error(j.error);
+        S.items = S.items.filter(y => y.id !== x.id); renderService(); } catch(err) { d.disabled = false; d.textContent = "Try again"; }
+    });
+    return f;
+  }
+  function renderService(){
+    const S = DATA.service, t = svcToday();
+    $("p-name").textContent = "Appliance service"; $("p-sub").textContent = "Water purifiers and ACs: last service and what's due";
+    $("svc-homes").innerHTML = [...new Set(S.homes.concat(S.items.map(x => x.home)))].map(h => `<option value="${esc(h)}">`).join("");
+    const st = S.items.map(x => ({x, s: svcState(x)}));
+    const n = k => st.filter(y => y.s.k === k).length;
+    $("svc-sum").innerHTML = `<span class="pill muted">${S.items.length} tracked</span>${n("over") ? `<span class="pill late">${n("over")} overdue</span>` : ""}${n("soon") ? `<span class="pill warn">${n("soon")} due soon</span>` : ""}${n("never") ? `<span class="pill warn">${n("never")} not logged</span>` : ""}`;
+    const addBox = $("svc-add-form"); addBox.innerHTML = ""; addBox.appendChild(svcForm(null));
+    if (!S.items.length) $("svc-add").open = true;
+    $("svc-filter").innerHTML = [["due", "Due & overdue"], ["Water purifier", "Purifiers"], ["AC", "ACs"], ["all", "All"]].map(([k, l]) => `<button type="button" data-f="${k}" class="${k === svcFilter ? "on" : ""}">${l}</button>`).join("");
+    const shown = st.filter(y => svcFilter === "all" || (svcFilter === "due" ? y.s.k !== "ok" : y.x.type === svcFilter));
+    const order = {over: 0, never: 1, soon: 2, ok: 3};
+    const list = $("svc-list"); list.innerHTML = "";
+    if (!shown.length) { list.innerHTML = `<p class="note">${S.items.length ? (svcFilter === "due" ? "Nothing due in the next 15 days. 🎉" : "Nothing here.") : "Nothing tracked yet. Use + Add above."}</p>`; return; }
+    const byHome = {}; shown.forEach(y => (byHome[y.x.home] = byHome[y.x.home] || []).push(y));
+    Object.keys(byHome).sort((a, b) => Math.min(...byHome[a].map(y => order[y.s.k])) - Math.min(...byHome[b].map(y => order[y.s.k])) || a.localeCompare(b)).forEach(h => {
+      const head = document.createElement("div"); head.className = "svc-home"; head.textContent = h; list.appendChild(head);
+      byHome[h].sort((a, b) => order[a.s.k] - order[b.s.k] || (a.s.due || "").localeCompare(b.s.due || "")).forEach(({x, s}) => {
+        const el = document.createElement("div"); el.className = "hk" + (s.k === "over" ? " late" : "");
+        const tel = (x.vendorPhone || "").replace(/[^0-9+]/g, ""), wa = tel.replace(/^\+/, "").replace(/^(\d{10})$/, "91$1");
+        el.innerHTML = `<div class="hk-top"><b>${x.type === "AC" ? "❄️" : "💧"} ${esc(x.type)}${x.unit ? " · " + esc(x.unit) : ""}</b><span class="pill ${s.cls}">${esc(s.label)}</span></div>
+          <div class="hk-meta">${x.last ? `Last serviced ${dayName(x.last, t)} ${x.last.slice(0, 4)}${x.cost ? " · ₹" + esc(x.cost) : ""} · next due ${dayName(s.due, t)} ${s.due.slice(0, 4)}` : "Add the last service date"} · every ${x.months} mo</div>
+          ${x.vendor || tel ? `<div class="hk-meta">${esc(x.vendor || "Vendor")}${tel ? ` · <a href="tel:${esc(tel)}">${esc(x.vendorPhone)}</a> · <a href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a>` : ""}</div>` : ""}
+          ${x.notes ? `<p class="lead-notes">${esc(x.notes)}</p>` : ""}
+          <div class="neg-form"><button class="btn gold" type="button" data-done>Serviced today</button><button class="small-btn" type="button" data-edit>Edit</button></div>`;
+        const swap = today => { const box = el.querySelector(".neg-form"); box.replaceWith(svcForm(x, {today})); };
+        el.querySelector("[data-done]").addEventListener("click", () => swap(true));
+        el.querySelector("[data-edit]").addEventListener("click", () => swap(false));
+        list.appendChild(el);
+      });
+    });
+  }
+  $("svc-filter").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if (b) { svcFilter = b.dataset.f; renderService(); } });
 
   // ---------- Owner outreach ----------
   let owFilter = "active";
@@ -1225,18 +1314,20 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
   function route(){
     if (!DATA) return;
     const opsOnly = !DATA.properties.length;
-    const hk = !!DATA.housekeeping && (location.hash === "#housekeeping" || (opsOnly && !/^#(reviews|info|owners)$/.test(location.hash)));
+    const hk = !!DATA.housekeeping && (location.hash === "#housekeeping" || (opsOnly && !/^#(reviews|info|owners|service)$/.test(location.hash)));
     const rv = !hk && location.hash === "#reviews" && !!DATA.reviews;
     const info = !hk && !rv && location.hash === "#info" && !!DATA.housekeeping;
     const ow = !hk && !rv && !info && location.hash === "#owners" && !!DATA.leads;
-    const ops = hk || rv || info || ow;
+    const svc = !hk && !rv && !info && !ow && location.hash === "#service" && !!DATA.service;
+    const ops = hk || rv || info || ow || svc;
     const rep = !ops && location.hash === "#report";
-    $("view-home").hidden = rep || ops; $("view-report").hidden = !rep; $("view-hk").hidden = !hk; $("view-rv").hidden = !rv; $("view-info").hidden = !info; $("view-ow").hidden = !ow;
+    $("view-home").hidden = rep || ops; $("view-report").hidden = !rep; $("view-hk").hidden = !hk; $("view-rv").hidden = !rv; $("view-info").hidden = !info; $("view-ow").hidden = !ow; $("view-svc").hidden = !svc;
     $("hero").hidden = ops; $("kpis").hidden = ops; $("p-switch").hidden = ops || DATA.properties.length < 2;
-    $("tab-homes").classList.toggle("on", !ops); $("tab-hk").classList.toggle("on", !!hk); $("tab-rv").classList.toggle("on", !!rv); $("tab-info").classList.toggle("on", !!info); $("tab-ow").classList.toggle("on", !!ow); $("tab-ow").hidden = !DATA.leads;
+    $("tab-homes").classList.toggle("on", !ops); $("tab-hk").classList.toggle("on", !!hk); $("tab-rv").classList.toggle("on", !!rv); $("tab-info").classList.toggle("on", !!info); $("tab-ow").classList.toggle("on", !!ow); $("tab-ow").hidden = !DATA.leads; $("tab-svc").classList.toggle("on", !!svc); $("tab-svc").hidden = !DATA.service;
     if (hk) { renderHK(); loadTonight(false); }
     if (rv) renderReviews();
     if (ow) renderOwners();
+    if (svc) renderService();
     if (info) { $("p-name").textContent = "Property info"; $("p-sub").textContent = "Codes, Wi-Fi and parking for every home"; loadInfo(false); }
     if (!ops && P) { const n = $("p-name"); if (n.textContent !== P.name) renderHome(); }
     if (rep) renderReport();
