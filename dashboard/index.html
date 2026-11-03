@@ -314,7 +314,7 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
       <h1 id="p-name"></h1>
       <p id="p-sub"></p>
       <select class="switch" id="p-switch" aria-label="Choose a home" hidden></select>
-      <nav class="tabs" id="admin-tabs" hidden><a href="#homes" id="tab-homes">Homes</a><a href="#housekeeping" id="tab-hk">Housekeeping</a><a href="#reviews" id="tab-rv">Reviews</a><a href="#info" id="tab-info">Info</a><a href="#owners" id="tab-ow">Owners</a><a href="#service" id="tab-svc">Service</a></nav>
+      <nav class="tabs" id="admin-tabs" hidden><a href="#homes" id="tab-homes">Homes</a><a href="#housekeeping" id="tab-hk">Housekeeping</a><a href="#ids" id="tab-ids">IDs</a><a href="#reviews" id="tab-rv">Reviews</a><a href="#info" id="tab-info">Info</a><a href="#owners" id="tab-ow">Owners</a><a href="#service" id="tab-svc">Service</a></nav>
     </div>
     <div class="hero-num" id="hero">
       <div class="label" id="share-label">Your share, all time</div>
@@ -390,12 +390,6 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
         <p class="note">Saving a price here records it for the team. Change it on Airbnb or PriceLabs with the "Open in Airbnb" link. Tata Housing is left out because it doesn't allow last-minute bookings.</p>
       </section>
       <section>
-        <div class="sec-head"><h2>Goa guest IDs</h2><small>Society mail due 24 hrs before check-in</small></div>
-        <div class="tn-sum" id="ids-sum"></div>
-        <div id="ids-list" style="display:grid;gap:8px;margin-top:10px"></div>
-        <p class="note" id="ids-note">Ticks itself when a "Guest ID Submission" mail for that flat and check-in date is in Rohit's Sent or Scheduled mail. Casa Sereno doesn't need one.</p>
-      </section>
-      <section>
         <div class="hk-sum" id="hk-sum"></div>
       </section>
       <section>
@@ -412,6 +406,16 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
         <div class="sec-head"><h2 id="hk-staff-h">Staff and payments</h2><small id="hk-month"></small></div>
         <div class="staff" id="hk-staff"></div>
         <p class="note">Payments are expenses with words like salary, maid, housekeeping or cleaning in the details. Add names, phones and monthly pay in the Staff tab of the sheet.</p>
+      </section>
+    </div>
+
+    <!-- Goa guest IDs (team only) -->
+    <div class="wrap" id="view-ids" hidden>
+      <section>
+        <div class="tn-sum" id="ids-sum"></div>
+        <div class="neg-filter" id="ids-filter" style="margin-top:12px"></div>
+        <div id="ids-list" style="display:grid;gap:8px;margin-top:6px"></div>
+        <p class="note" id="ids-note">Every Goa check-in from yesterday to 14 days ahead, for all staff. A booking ticks itself when a "Guest ID Submission" mail for that flat and check-in date is in Rohit's Sent or Scheduled mail. New bookings show up within about 30 minutes. Casa Sereno doesn't need one.</p>
       </section>
     </div>
 
@@ -583,7 +587,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
     $("admin-tabs").hidden = !DATA.housekeeping;
     $("tab-homes").hidden = !DATA.properties.length;
     if (DATA.admin && DATA.housekeeping && !location.hash) history.replaceState(null, "", location.pathname + location.search + "#housekeeping");
-    if (!DATA.properties.length) { if (!/^#(housekeeping|reviews|info|owners|service)$/.test(location.hash)) history.replaceState(null, "", location.pathname + location.search + "#housekeeping"); return; }
+    if (!DATA.properties.length) { if (!/^#(housekeeping|reviews|info|owners|service|ids)$/.test(location.hash)) history.replaceState(null, "", location.pathname + location.search + "#housekeeping"); return; }
     pick(0);
   }
 
@@ -652,7 +656,6 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
       evs.forEach(e => wrap.appendChild(hkCard(e, H.today)));
       box.appendChild(wrap);
     });
-    renderIds();
     renderMidStays();
     $("hk-month").textContent = mLabel(H.month, true);
     const teamView = !DATA.admin; $("hk-staff-h").textContent = teamView ? "Staff" : "Staff and payments"; $("hk-staff").nextElementSibling.hidden = teamView;
@@ -997,23 +1000,33 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
   }
 
   // ---------- Goa guest IDs ----------
+  let idsFilter = "todo";
   function renderIds(){
-    const H = DATA.housekeeping, list = $("ids-list"), ids = (H.ids || []).filter(b => mine(b.property));
-    const today = H.today;
-    const done = ids.filter(b => b.mailSent).length;
-    const overdue = ids.filter(b => !b.mailSent && b.deadline <= today).length;
-    $("ids-sum").innerHTML = `<span class="pill">${done} done</span><span class="pill muted">${ids.length - done - overdue} pending</span>${overdue ? `<span class="pill warn">${overdue} due now</span>` : ""}<span>next 10 days</span>`;
-    list.innerHTML = ids.length ? "" : `<p class="note">No Goa check-ins in the next 10 days.</p>`;
-    ids.forEach(b => list.appendChild(idCard(b, today)));
-    if (ids.length && !ids[0].gmailChecked) $("ids-note").textContent = "Couldn't check Sent mail just now, so only manual ticks are shown.";
+    const H = DATA.housekeeping, list = $("ids-list"), all = H.ids || [], today = H.today;
+    $("p-name").textContent = "Goa guest IDs"; $("p-sub").textContent = "Society mail is due 24 hrs before check-in";
+    const isDue = b => !b.mailSent && b.deadline <= today;
+    const done = all.filter(b => b.mailSent).length, due = all.filter(isDue).length, waiting = all.length - done - due;
+    $("ids-sum").innerHTML = `${due ? `<span class="pill late">${due} due now</span>` : ""}<span class="pill warn">${waiting} coming up</span><span class="pill">${done} done</span><span>yesterday → next 14 days</span>`;
+    $("ids-filter").innerHTML = [["todo", `To do (${due + waiting})`], ["done", `Done (${done})`], ["all", "All"]].map(([k, l]) => `<button type="button" data-f="${k}" class="${k === idsFilter ? "on" : ""}">${l}</button>`).join("");
+    const shown = all.filter(b => idsFilter === "all" || (idsFilter === "done") === !!b.mailSent);
+    list.innerHTML = "";
+    if (!shown.length) list.innerHTML = `<p class="note">${!all.length ? "No Goa check-ins from yesterday to 14 days ahead." : idsFilter === "todo" ? "All mails are sent or scheduled. 🎉" : "Nothing here yet."}</p>`;
+    let lastDay = "";
+    shown.forEach(b => {
+      if (b.checkIn !== lastDay) { lastDay = b.checkIn; const h = document.createElement("div"); h.className = "svc-home"; h.textContent = "Check-in " + dayName(b.checkIn, today); list.appendChild(h); }
+      list.appendChild(idCard(b, today));
+    });
+    if (all.length && !all[0].gmailChecked) $("ids-note").textContent = "Couldn't check Sent mail just now, so only manual ticks are shown.";
   }
+  $("ids-filter").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if (b) { idsFilter = b.dataset.f; renderIds(); } });
   function idCard(b, today){
     const el = document.createElement("div");
     const due = !b.mailSent && b.deadline <= today;
     el.className = "hk" + (b.mailSent ? " done" : "") + (due ? " late" : "");
     const status = b.mailSent ? `<span class="pill">${b.mailScheduled ? "Mail scheduled ✓" : b.mailAuto ? "Mail sent ✓" : "Marked sent"}</span>` : b.idsReceived ? `<span class="pill muted">IDs in, mail pending</span>` : `<span class="pill ${due ? "warn" : "muted"}">${due ? "Due now" : "Waiting for IDs"}</span>`;
     el.innerHTML = `<div class="hk-top"><b>${esc(b.flat)} · ${esc(b.property)}</b>${status}</div>
-      <div class="hk-meta">Check-in ${dayName(b.checkIn, today)} → ${dayName(b.checkOut, today)}${b.guests ? " · " + b.guests + " guest" + (b.guests > 1 ? "s" : "") : ""}${b.code ? " · " + esc(b.code) : ""}</div>
+      ${b.guestName ? `<div class="hk-meta"><b>${esc(b.guestName)}</b></div>` : ""}<div class="hk-meta">${dayName(b.checkIn, today)} → ${dayName(b.checkOut, today)} · ${dayDiff(b.checkIn, b.checkOut)} night${dayDiff(b.checkIn, b.checkOut) === 1 ? "" : "s"}${b.guests ? " · " + b.guests + " guest" + (b.guests > 1 ? "s" : "") : ""}${b.code ? " · " + esc(b.code) : ""}</div>
+      ${b.mailSent ? "" : `<div class="hk-meta">Mail due ${b.deadline < today ? "since " + dayName(b.deadline, today) : b.deadline === today ? "today" : "by " + dayName(b.deadline, today)}${b.phone ? ` · <a href="tel:${esc(b.phone)}">${esc(b.phone)}</a> · <a href="https://wa.me/${esc(b.phone.replace(/[^0-9]/g, ""))}?text=${encodeURIComponent("Hi" + (b.guestName ? " " + b.guestName.split(" ")[0] : "") + ", please share ID proofs (Aadhaar / passport / driving licence) of all guests for your stay at " + b.flat + " from " + dayName(b.checkIn, today) + ". The society needs them 24 hours before check-in. Thank you!")}" target="_blank" rel="noopener">WhatsApp guest</a>` : ""}</div>`}
       ${b.by ? `<div class="hk-meta">Updated by ${esc(b.by)} ${esc((b.at || "").slice(5))}${b.note ? " · " + esc(b.note) : ""}</div>` : b.note ? `<div class="hk-meta">${esc(b.note)}</div>` : ""}
       ${b.mailAuto ? "" : `<div class="neg-form"><button class="btn${b.idsReceived ? "" : " gold"}" type="button" data-k="ids">${b.idsReceived ? "Undo IDs received" : "IDs received"}</button><button class="btn" type="button" data-k="mail">${b.mailSent ? "Undo mail sent" : "Mark mail sent"}</button>${b.code ? `<a class="tn-link" href="https://www.airbnb.co.in/hosting/reservations/details/${esc(b.code)}" target="_blank" rel="noopener">Open booking</a>` : ""}</div>`}`;
     el.querySelectorAll("[data-k]").forEach(btn => btn.addEventListener("click", async () => {
@@ -1095,6 +1108,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
   }
   $("tn-refresh").addEventListener("click", () => loadTonight(true));
 
+  function dayDiff(a, b){ return Math.round((Date.parse(b) - Date.parse(a)) / 864e5); }
   function addDays(d, n){ const t = new Date(d + "T00:00:00Z"); t.setUTCDate(t.getUTCDate() + n); return t.toISOString().slice(0,10); }
   function hkCard(e, today){
     const el = document.createElement("div");
@@ -1314,20 +1328,22 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
   function route(){
     if (!DATA) return;
     const opsOnly = !DATA.properties.length;
-    const hk = !!DATA.housekeeping && (location.hash === "#housekeeping" || (opsOnly && !/^#(reviews|info|owners|service)$/.test(location.hash)));
+    const hk = !!DATA.housekeeping && (location.hash === "#housekeeping" || (opsOnly && !/^#(reviews|info|owners|service|ids)$/.test(location.hash)));
     const rv = !hk && location.hash === "#reviews" && !!DATA.reviews;
     const info = !hk && !rv && location.hash === "#info" && !!DATA.housekeeping;
     const ow = !hk && !rv && !info && location.hash === "#owners" && !!DATA.leads;
     const svc = !hk && !rv && !info && !ow && location.hash === "#service" && !!DATA.service;
-    const ops = hk || rv || info || ow || svc;
+    const ids = !hk && !rv && !info && !ow && !svc && location.hash === "#ids" && !!DATA.housekeeping;
+    const ops = hk || rv || info || ow || svc || ids;
     const rep = !ops && location.hash === "#report";
-    $("view-home").hidden = rep || ops; $("view-report").hidden = !rep; $("view-hk").hidden = !hk; $("view-rv").hidden = !rv; $("view-info").hidden = !info; $("view-ow").hidden = !ow; $("view-svc").hidden = !svc;
+    $("view-home").hidden = rep || ops; $("view-report").hidden = !rep; $("view-hk").hidden = !hk; $("view-rv").hidden = !rv; $("view-info").hidden = !info; $("view-ow").hidden = !ow; $("view-svc").hidden = !svc; $("view-ids").hidden = !ids;
     $("hero").hidden = ops; $("kpis").hidden = ops; $("p-switch").hidden = ops || DATA.properties.length < 2;
-    $("tab-homes").classList.toggle("on", !ops); $("tab-hk").classList.toggle("on", !!hk); $("tab-rv").classList.toggle("on", !!rv); $("tab-info").classList.toggle("on", !!info); $("tab-ow").classList.toggle("on", !!ow); $("tab-ow").hidden = !DATA.leads; $("tab-svc").classList.toggle("on", !!svc); $("tab-svc").hidden = !DATA.service;
+    $("tab-homes").classList.toggle("on", !ops); $("tab-hk").classList.toggle("on", !!hk); $("tab-rv").classList.toggle("on", !!rv); $("tab-info").classList.toggle("on", !!info); $("tab-ow").classList.toggle("on", !!ow); $("tab-ow").hidden = !DATA.leads; $("tab-svc").classList.toggle("on", !!svc); $("tab-svc").hidden = !DATA.service; $("tab-ids").classList.toggle("on", !!ids); $("tab-ids").hidden = !DATA.housekeeping;
     if (hk) { renderHK(); loadTonight(false); }
     if (rv) renderReviews();
     if (ow) renderOwners();
     if (svc) renderService();
+    if (ids) renderIds();
     if (info) { $("p-name").textContent = "Property info"; $("p-sub").textContent = "Codes, Wi-Fi and parking for every home"; loadInfo(false); }
     if (!ops && P) { const n = $("p-name"); if (n.textContent !== P.name) renderHome(); }
     if (rep) renderReport();
