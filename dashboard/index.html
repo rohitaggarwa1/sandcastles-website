@@ -338,7 +338,7 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
         <div class="sec-head"><h2>Goa guest IDs</h2><small>Society mail due 24 hrs before check-in</small></div>
         <div class="tn-sum" id="ids-sum"></div>
         <div id="ids-list" style="display:grid;gap:8px;margin-top:10px"></div>
-        <p class="note" id="ids-note">"Mail sent" ticks itself when a "Guest ID Submission" mail for that flat and check-in date is in Rohit's Sent mail. Casa Sereno doesn't need one.</p>
+        <p class="note" id="ids-note">Ticks itself when a "Guest ID Submission" mail for that flat and check-in date is in Rohit's Sent or Scheduled mail. Casa Sereno doesn't need one.</p>
       </section>
       <section>
         <div class="hk-sum" id="hk-sum"></div>
@@ -346,6 +346,12 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
       <section>
         <div class="sec-head"><h2>Turnovers</h2><small id="hk-range"></small></div>
         <div id="hk-events" style="display:grid;gap:14px"></div>
+      </section>
+      <section>
+        <div class="sec-head"><h2>Mid-stay cleaning</h2><small>Guests staying now</small></div>
+        <div class="tn-sum" id="ms-sum"></div>
+        <datalist id="maid-names"></datalist>
+        <div id="ms-list" style="display:grid;gap:8px;margin-top:10px"></div>
       </section>
       <section>
         <div class="sec-head"><h2 id="hk-staff-h">Staff and payments</h2><small id="hk-month"></small></div>
@@ -534,6 +540,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
       box.appendChild(wrap);
     });
     renderIds();
+    renderMidStays();
     $("hk-month").textContent = mLabel(H.month, true);
     const teamView = !DATA.admin; $("hk-staff-h").textContent = teamView ? "Staff" : "Staff and payments"; $("hk-staff").nextElementSibling.hidden = teamView;
     const st = $("hk-staff");
@@ -692,6 +699,47 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
   $("info-q").addEventListener("input", () => INFO && renderInfo());
   document.addEventListener("visibilitychange", () => { if (document.hidden) document.querySelectorAll("#info-list .info-val").forEach(v => v.classList.add("masked")); });
 
+  // ---------- Mid-stay cleaning ----------
+  function renderMidStays(){
+    const H = DATA.housekeeping, list = $("ms-list"), stays = H.midStays || [], today = H.today;
+    const names = [...new Set((H.staff || []).flatMap(h => h.staff.map(x => x.name)).filter(Boolean))];
+    $("maid-names").innerHTML = names.map(n => `<option value="${esc(n)}">`).join("");
+    const todays = stays.flatMap(st => st.cleans.filter(c => c.date === today));
+    $("ms-sum").innerHTML = `<span class="pill muted">${stays.length} staying</span><span class="pill${todays.some(c => c.status !== "Done") ? " warn" : ""}">${todays.length} clean${todays.length === 1 ? "" : "s"} today</span><span>${todays.filter(c => c.status === "Done").length} done</span>`;
+    list.innerHTML = stays.length ? "" : `<p class="note">No one is staying right now.</p>`;
+    stays.forEach(st => list.appendChild(msCard(st, today)));
+  }
+  function msCard(st, today){
+    const el = document.createElement("div"); el.className = "hk";
+    const nextDay = addDays(today, 1) < st.checkOut ? addDays(today, 1) : today;
+    el.innerHTML = `<div class="hk-top"><b>${esc(st.property)}</b><span class="pill muted">Night ${st.night} of ${st.nights}</span></div>
+      <div class="hk-meta">${st.guests ? st.guests + " guest" + (st.guests > 1 ? "s" : "") + " · " : ""}checks out ${dayName(st.checkOut, today)}${st.code ? ` · <a href="https://www.airbnb.co.in/hosting/reservations/details/${esc(st.code)}" target="_blank" rel="noopener">booking</a>` : ""}</div>
+      ${st.cleans.map((c, i) => `<div class="row" style="font-size:13.5px;align-items:center"><span>${dayName(c.date, today)} · ${esc(c.maid || "maid not set")}${c.note ? " · " + esc(c.note) : ""}</span><span>${c.status === "Done" ? `<span class="pill">Done</span>` : `<button class="small-btn" type="button" data-done="${i}">Mark done</button>`} · <button class="small-btn" type="button" data-del="${i}">Remove</button></span></div>`).join("")}
+      <form class="neg-form"><input type="date" name="date" value="${nextDay}" min="${st.checkIn}" max="${st.checkOut}" aria-label="Clean date" style="flex:0 0 auto"><input name="maid" list="maid-names" placeholder="Maid" aria-label="Maid"><input name="note" placeholder="Note (e.g. towels, 11 am)" aria-label="Note"><button class="btn" type="submit">Add cleaning</button></form>`;
+    const call = async extra => {
+      const q = new URLSearchParams({action: "stayclean", token: store.get() || memToken, key: st.key, property: st.property, ...extra});
+      const j = await fetch(API + "?" + q).then(r => r.json());
+      if (!j.ok) throw new Error(j.error); return j;
+    };
+    el.querySelector("form").addEventListener("submit", async ev => {
+      ev.preventDefault(); const f = ev.target, b = f.querySelector("button"); b.disabled = true; b.textContent = "Saving…";
+      try {
+        const j = await call({date: f.date.value, maid: f.maid.value.trim(), note: f.note.value.trim(), status: "Planned"});
+        st.cleans = st.cleans.filter(c => c.date !== j.date).concat([{date: j.date, maid: j.maid, status: j.status, note: j.note}]).sort((a, b) => a.date < b.date ? -1 : 1);
+        renderMidStays();
+      } catch(err) { b.disabled = false; b.textContent = err.message || "Try again"; }
+    });
+    el.querySelectorAll("[data-done],[data-del]").forEach(btn => btn.addEventListener("click", async () => {
+      const c = st.cleans[+(btn.dataset.done ?? btn.dataset.del)]; btn.disabled = true;
+      try {
+        if (btn.dataset.del != null) { await call({date: c.date, del: "1"}); st.cleans = st.cleans.filter(x => x !== c); }
+        else { await call({date: c.date, status: "Done"}); c.status = "Done"; }
+        renderMidStays();
+      } catch(err) { btn.disabled = false; btn.textContent = "Try again"; }
+    }));
+    return el;
+  }
+
   // ---------- Goa guest IDs ----------
   function renderIds(){
     const H = DATA.housekeeping, list = $("ids-list"), ids = H.ids || [];
@@ -707,7 +755,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
     const el = document.createElement("div");
     const due = !b.mailSent && b.deadline <= today;
     el.className = "hk" + (b.mailSent ? " done" : "") + (due ? " late" : "");
-    const status = b.mailSent ? `<span class="pill">${b.mailAuto ? "Mail sent ✓" : "Marked sent"}</span>` : b.idsReceived ? `<span class="pill muted">IDs in, mail pending</span>` : `<span class="pill ${due ? "warn" : "muted"}">${due ? "Due now" : "Waiting for IDs"}</span>`;
+    const status = b.mailSent ? `<span class="pill">${b.mailScheduled ? "Mail scheduled ✓" : b.mailAuto ? "Mail sent ✓" : "Marked sent"}</span>` : b.idsReceived ? `<span class="pill muted">IDs in, mail pending</span>` : `<span class="pill ${due ? "warn" : "muted"}">${due ? "Due now" : "Waiting for IDs"}</span>`;
     el.innerHTML = `<div class="hk-top"><b>${esc(b.flat)} · ${esc(b.property)}</b>${status}</div>
       <div class="hk-meta">Check-in ${dayName(b.checkIn, today)} → ${dayName(b.checkOut, today)}${b.guests ? " · " + b.guests + " guest" + (b.guests > 1 ? "s" : "") : ""}${b.code ? " · " + esc(b.code) : ""}</div>
       ${b.by ? `<div class="hk-meta">Updated by ${esc(b.by)} ${esc((b.at || "").slice(5))}${b.note ? " · " + esc(b.note) : ""}</div>` : b.note ? `<div class="hk-meta">${esc(b.note)}</div>` : ""}
