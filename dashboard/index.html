@@ -247,6 +247,8 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
 .lead-notes{font-size:13.5px;line-height:1.5;white-space:pre-wrap;margin:0;color:var(--fg)}
 .pill.late{background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad)}
 .svc-home{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 0 2px}
+.sync-chip{font:inherit;font-size:11.5px;border:0;background:none;color:var(--on-navy-muted);padding:0;cursor:default;white-space:nowrap}
+.sync-chip.act{color:var(--gold, #c9a24a);text-decoration:underline;cursor:pointer}
 </style>
 </head>
 <body>
@@ -308,7 +310,7 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
   <header class="band no-print"><div class="wrap">
     <div class="top">
       <a class="brand" href="/"><svg><use href="#castle"/></svg><b>SANDCASTLES</b></a>
-      <div class="who"><span id="who"></span><button class="linkbtn" id="signout" type="button">Sign out</button></div>
+      <div class="who"><button class="sync-chip" id="sync-chip" type="button" hidden></button><span id="who"></span><button class="linkbtn" id="signout" type="button">Sign out</button></div>
     </div>
     <div class="home">
       <h1 id="p-name"></h1>
@@ -514,7 +516,12 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
   const store = {
     get(){ try { return localStorage.getItem("sc_owner_token"); } catch(e){ return null; } },
     set(v){ try { localStorage.setItem("sc_owner_token", v); } catch(e){} },
-    clear(){ try { localStorage.removeItem("sc_owner_token"); } catch(e){} }
+    clear(){ try { localStorage.removeItem("sc_owner_token"); localStorage.removeItem("sc_data"); } catch(e){} }
+  };
+  // Last loaded data, so the app opens instantly and refreshes in the background.
+  const dataCache = {
+    get(token){ try { const c = JSON.parse(localStorage.getItem("sc_data") || "null"); return c && c.token === token && Date.now() - c.at < 3 * 864e5 ? c : null; } catch(e){ return null; } },
+    set(token, data){ try { localStorage.setItem("sc_data", JSON.stringify({token, at: Date.now(), data})); } catch(e){} }
   };
   let DATA = null, P = null, showAll = false, memToken = null;
 
@@ -551,27 +558,50 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
   $("signout").addEventListener("click", () => { store.clear(); memToken = null; DATA = null; history.replaceState(null, "", location.pathname); show("signin"); });
 
   // ---------- Load ----------
+  let pending = null;
+  function chip(text, act){ const c = $("sync-chip"); c.hidden = !text; c.textContent = text || ""; c.classList.toggle("act", !!act); }
+  $("sync-chip").addEventListener("click", () => { if (pending) applyData(pending, true); });
+  function editing(){ const a = document.activeElement; return a && a !== document.body && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && !$("view-app").hidden; }
+  function applyData(j, keepPlace){
+    const y = window.scrollY, pName = P && P.name;
+    DATA = j; pending = null; setup();
+    if (keepPlace && pName) { const i = DATA.properties.findIndex(x => x.name === pName); if (i > 0) { $("p-switch").value = i; pick(i); } }
+    route();
+    if (keepPlace) window.scrollTo(0, y);
+  }
   async function load(){
     const url = new URL(location.href);
     const t = url.searchParams.get("t");
     if (t) { store.set(t); memToken = t; }
     const token = store.get() || memToken;
     if (!token || !API) { show("signin"); return; }
-    show("loading");
+    const cached = dataCache.get(token);
+    if (cached) {
+      DATA = cached.data; setup(); show("app"); route(); chip("Updating…");
+      history.replaceState(null, "", location.pathname + "?t=" + encodeURIComponent(token) + location.hash);
+      setupInstall();
+    } else show("loading");
     try {
       const r = await fetch(API + "?action=data&token=" + encodeURIComponent(token));
       const j = await r.json();
       if (!j.ok) {
-        store.clear(); show("signin");
+        store.clear(); chip(""); show("signin");
         const msg = $("signin-msg"); msg.className = "msg err";
         msg.textContent = j.error === "expired" ? "Your sign-in link has expired. Enter your email for a new one." : j.error;
         msg.hidden = false; return;
       }
-      DATA = j; setup(); show("app"); route();
+      dataCache.set(token, j);
+      if (cached) {
+        if (editing()) { pending = j; chip("New data · tap to refresh", true); }
+        else { applyData(j, true); chip(""); }
+      } else {
+        DATA = j; setup(); show("app"); route();
+        history.replaceState(null, "", location.pathname + "?t=" + encodeURIComponent(token) + location.hash);
+        setupInstall();
+      }
       if (window.opener && (DATA.admin || DATA.team)) { try { window.opener.postMessage({type: "sc-ready"}, "*"); } catch(e){} }
-      history.replaceState(null, "", location.pathname + "?t=" + encodeURIComponent(token) + location.hash);
-      setupInstall();
     } catch(err) {
+      if (cached) { chip("Offline · saved data"); return; }
       show("signin");
       const msg = $("signin-msg"); msg.className = "msg err"; msg.textContent = "Couldn't load your data. Check your connection and refresh.";
       msg.hidden = false;
