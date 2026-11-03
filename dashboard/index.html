@@ -371,6 +371,11 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
     <!-- Housekeeping (admin only) -->
     <div class="wrap" id="view-hk" hidden>
       <section>
+        <div id="staff-pick-wrap" hidden style="margin-bottom:18px">
+          <div class="label" style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)">Show work for</div>
+          <div class="neg-filter" id="staff-pick"></div>
+          <div class="hk-meta" id="staff-card" style="margin-top:8px"></div>
+        </div>
         <div class="sec-head"><h2>Tonight</h2><small><button class="small-btn" id="tn-refresh" type="button">Refresh</button></small></div>
         <div class="tn-sum" id="tn-sum">Checking Airbnb calendars…</div>
         <div id="tn-list" style="display:grid;gap:8px"></div>
@@ -565,20 +570,45 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
     const wd = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date(d + "T00:00:00").getDay()];
     return wd + " " + +d.slice(8,10) + " " + MON[+d.slice(5,7)-1];
   }
+  // ---------- Staff picker: show one person's homes ----------
+  let staffSel = "all";
+  try { staffSel = localStorage.getItem("sc_staff") || "all"; } catch(e){}
+  const teamList = () => (DATA && DATA.housekeeping && DATA.housekeeping.team) || [];
+  const coversProp = (p, prop) => p.covers.some(c => String(prop).toLowerCase().includes(String(c).toLowerCase()));
+  const selPerson = () => teamList().find(p => p.name === staffSel);
+  const mine = prop => { const p = selPerson(); return !p || coversProp(p, prop); };
+  const maidFor = prop => { const p = selPerson() || teamList().find(x => coversProp(x, prop)); return p ? p.name : ""; };
+  function renderStaffPick(){
+    const T = teamList(), wrap = $("staff-pick-wrap");
+    wrap.hidden = !T.length; if (!T.length) return;
+    if (staffSel !== "all" && !selPerson()) staffSel = "all";
+    $("staff-pick").innerHTML = [["all", "Everyone"]].concat(T.map(p => [p.name, p.name])).map(([k, l]) => `<button type="button" data-staff="${esc(k)}" class="${k === staffSel ? "on" : ""}">${esc(l)}</button>`).join("");
+    const p = selPerson();
+    const tel = p && p.phone ? p.phone.replace(/[^0-9+]/g, "") : "";
+    $("staff-card").innerHTML = p ? `${esc(p.role || "Staff")} · covers ${p.covers.map(esc).join(", ")}${tel ? ` · <a href="tel:${esc(tel)}">${esc(p.phone)}</a> · <a href="https://wa.me/${esc(tel.replace(/^\+/, ""))}" target="_blank" rel="noopener">WhatsApp</a>` : ""}` : "";
+  }
+  $("staff-pick").addEventListener("click", e => {
+    const b = e.target.closest("[data-staff]"); if (!b) return;
+    staffSel = b.dataset.staff; try { localStorage.setItem("sc_staff", staffSel); } catch(err){}
+    renderHK(); if (TN) renderTonight();
+  });
+
   function renderHK(){
     const H = DATA.housekeeping; if (!H) return;
+    renderStaffPick();
+    const EV = H.events.filter(e => mine(e.property));
     $("p-name").textContent = "Housekeeping";
-    $("p-sub").textContent = `${DATA.properties.length ? DATA.properties.length + " homes" : "All homes"} · ${dayName(H.from, H.today)} to ${dayName(H.to, H.today)}`;
-    const outs = H.events.filter(e => e.kind === "out");
+    $("p-sub").textContent = `${selPerson() ? selPerson().name + "'s homes" : "All homes"} · ${dayName(H.from, H.today)} to ${dayName(H.to, H.today)}`;
+    const outs = EV.filter(e => e.kind === "out");
     const pending = outs.filter(e => !e.cleaned && e.date <= H.today);
     const todayOut = outs.filter(e => e.date === H.today).length;
-    const weekIn = H.events.filter(e => e.kind === "in" && e.date <= addDays(H.today, 7)).length;
+    const weekIn = EV.filter(e => e.kind === "in" && e.date <= addDays(H.today, 7)).length;
     $("hk-sum").innerHTML = `<div><b>${todayOut}</b><span>check-outs today</span></div>
       <div><b>${pending.length}</b><span>cleans not marked</span></div>
       <div><b>${weekIn}</b><span>check-ins next 7 days</span></div>`;
     $("hk-range").textContent = "Past 7 days and next 14";
     const days = {};
-    H.events.forEach(e => (days[e.date] = days[e.date] || []).push(e));
+    EV.forEach(e => (days[e.date] = days[e.date] || []).push(e));
     const box = $("hk-events"); box.innerHTML = "";
     const dates = Object.keys(days).sort();
     if (!dates.length) box.innerHTML = `<p class="note">No check-ins or check-outs in this window.</p>`;
@@ -594,7 +624,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
     $("hk-month").textContent = mLabel(H.month, true);
     const teamView = !DATA.admin; $("hk-staff-h").textContent = teamView ? "Staff" : "Staff and payments"; $("hk-staff").nextElementSibling.hidden = teamView;
     const st = $("hk-staff");
-    const staffList = H.staff.filter(h => !h.hidePay || h.staff.some(x => x.name));
+    const staffList = H.staff.filter(h => (!h.hidePay || h.staff.some(x => x.name)) && mine(h.property));
     st.innerHTML = staffList.length ? "" : `<p class="note">No staff added yet.</p>`;
     staffList.forEach(h => {
       const el = document.createElement("div"); el.className = "panel";
@@ -751,8 +781,8 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
 
   // ---------- Mid-stay cleaning ----------
   function renderMidStays(){
-    const H = DATA.housekeeping, list = $("ms-list"), stays = H.midStays || [], today = H.today;
-    const names = [...new Set((H.staff || []).flatMap(h => h.staff.map(x => x.name)).filter(Boolean))];
+    const H = DATA.housekeeping, list = $("ms-list"), stays = (H.midStays || []).filter(st => mine(st.property)), today = H.today;
+    const names = [...new Set((H.staff || []).flatMap(h => h.staff.map(x => x.name)).concat(teamList().map(p => p.name)).filter(Boolean))];
     $("maid-names").innerHTML = names.map(n => `<option value="${esc(n)}">`).join("");
     const todays = stays.flatMap(st => st.cleans.filter(c => c.date === today));
     $("ms-sum").innerHTML = `<span class="pill muted">${stays.length} staying</span><span class="pill${todays.some(c => c.status !== "Done") ? " warn" : ""}">${todays.length} clean${todays.length === 1 ? "" : "s"} today</span><span>${todays.filter(c => c.status === "Done").length} done</span>`;
@@ -769,7 +799,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
     el.innerHTML = `<div class="hk-top"><b>${esc(st.property)}</b><span class="pill muted">Night ${st.night} of ${st.nights}</span></div>
       <div class="hk-meta">${st.guests ? st.guests + " guest" + (st.guests > 1 ? "s" : "") + " · " : ""}checks out ${dayName(st.checkOut, today)}${st.code ? ` · <a href="https://www.airbnb.co.in/hosting/reservations/details/${esc(st.code)}" target="_blank" rel="noopener">booking</a>` : ""}</div>
       ${st.cleans.map((c, i) => `<div class="row" style="font-size:13.5px;align-items:center"><span>${dayName(c.date, today)} · ${esc(c.maid || "maid not set")}${c.note ? " · " + esc(c.note) : ""}</span><span>${c.status === "Done" ? `<span class="pill">Done</span>` : `<button class="small-btn" type="button" data-done="${i}">Mark done</button>`} · <button class="small-btn" type="button" data-del="${i}">Remove</button></span></div>`).join("")}
-      <form class="neg-form"><input type="date" name="date" value="${nextDay}" min="${st.checkIn}" max="${st.checkOut}" aria-label="Clean date" style="flex:0 0 auto"><input name="maid" list="maid-names" placeholder="Maid" aria-label="Maid"><input name="note" placeholder="Note (e.g. towels, 11 am)" aria-label="Note"><button class="btn" type="submit">Add cleaning</button></form>`;
+      <form class="neg-form"><input type="date" name="date" value="${nextDay}" min="${st.checkIn}" max="${st.checkOut}" aria-label="Clean date" style="flex:0 0 auto"><input name="maid" list="maid-names" placeholder="Maid" aria-label="Maid" value="${esc(maidFor(st.property))}"><input name="note" placeholder="Note (e.g. towels, 11 am)" aria-label="Note"><button class="btn" type="submit">Add cleaning</button></form>`;
     const call = async extra => {
       const q = new URLSearchParams({action: "stayclean", token: store.get() || memToken, key: st.key, property: st.property, ...extra});
       const j = await fetch(API + "?" + q).then(r => r.json());
@@ -796,7 +826,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
 
   // ---------- Goa guest IDs ----------
   function renderIds(){
-    const H = DATA.housekeeping, list = $("ids-list"), ids = H.ids || [];
+    const H = DATA.housekeeping, list = $("ids-list"), ids = (H.ids || []).filter(b => mine(b.property));
     const today = H.today;
     const done = ids.filter(b => b.mailSent).length;
     const overdue = ids.filter(b => !b.mailSent && b.deadline <= today).length;
@@ -874,7 +904,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
     return el;
   }
   function renderTonight(){
-    const L = TN.listings, box = $("tn-list"); box.innerHTML = "";
+    const L = TN.listings.filter(l => mine(l.name)), box = $("tn-list"); box.innerHTML = "";
     const empty = L.filter(l => l.state === "empty"), closed = L.filter(l => l.state === "blocked"), booked = L.filter(l => l.state === "booked");
     $("tn-sum").innerHTML = `<span class="pill">${empty.length} empty</span><span class="pill muted">${closed.length} closed</span><span class="pill warn">${booked.length} booked</span><span>of ${L.length} listings</span>`;
     const byArea = list => { const g = {}; list.forEach(l => (g[l.area || "Other"] = g[l.area || "Other"] || []).push(l)); return g; };
@@ -912,7 +942,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
       <div class="hk-meta">${[who, nights].filter(Boolean).join(" · ")}</div>
       ${e.cleaned
         ? `<div class="hk-meta">Cleaned${e.cleaned.by ? " by " + esc(e.cleaned.by) : ""}${e.cleaned.at ? " · " + esc(e.cleaned.at) : ""}${e.cleaned.note ? " · " + esc(e.cleaned.note) : ""} <button class="small-btn" type="button" data-undo>Undo</button></div>`
-        : (e.date <= addDays(today, 1) ? `<form class="hk-form"><input name="by" placeholder="Cleaned by" autocomplete="off"><input name="note" placeholder="Note (optional)" autocomplete="off"><button class="btn" type="submit">Mark cleaned</button></form>` : "")}`;
+        : (e.date <= addDays(today, 1) ? `<form class="hk-form"><input name="by" placeholder="Cleaned by" autocomplete="off" value="${esc(maidFor(e.property))}"><input name="note" placeholder="Note (optional)" autocomplete="off"><button class="btn" type="submit">Mark cleaned</button></form>` : "")}`;
     const f = el.querySelector("form");
     if (f) f.addEventListener("submit", async ev => {
       ev.preventDefault(); const b = f.querySelector("button"); b.disabled = true; b.textContent = "Saving…";
