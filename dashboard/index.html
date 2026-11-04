@@ -644,7 +644,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
   const coversProp = (p, prop) => p.covers.some(c => String(prop).toLowerCase().includes(String(c).toLowerCase()));
   const selPerson = () => teamList().find(p => p.name === staffSel);
   const mine = prop => { const p = selPerson(); return !p || coversProp(p, prop); };
-  const maidFor = prop => { const p = selPerson() || teamList().find(x => coversProp(x, prop)); return p ? p.name : ""; };
+  const maidFor = prop => { const p = selPerson() || teamList().find(x => !/caretaker/i.test(x.role || "") && coversProp(x, prop)); return p ? p.name : ""; };
   function renderStaffPick(){
     const T = teamList(), wrap = $("staff-pick-wrap");
     wrap.hidden = !T.length; if (!T.length) return;
