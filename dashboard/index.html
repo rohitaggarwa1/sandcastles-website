@@ -247,6 +247,37 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
 .lead-notes{font-size:13.5px;line-height:1.5;white-space:pre-wrap;margin:0;color:var(--fg)}
 .pill.late{background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad)}
 .svc-home{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 0 2px}
+.tabs .tab-more{font:inherit;color:var(--gold-soft);background:none;font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px;border:1px solid rgba(230,207,157,.35);cursor:pointer}
+.tabs .tab-more.on{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+.more-menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-top:8px}
+.more-menu a{color:var(--gold-soft);text-decoration:none;font-size:13.5px;font-weight:600;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,.06)}
+.more-menu a.on{background:var(--gold);color:var(--navy)}
+.staff-select{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-size:14px;background:var(--card);color:var(--fg);margin-top:6px;min-width:200px}
+details.fold{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+details.fold>summary{cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-weight:700;font-size:14.5px;list-style:none}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary::after{content:"▾";color:var(--muted);margin-left:auto}
+details.fold[open]>summary::after{content:"▴"}
+details.fold>summary small{color:var(--muted);font-weight:500;font-size:12.5px}
+.wk-quick{display:grid;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
+.wk-quick input,.wk-quick select{box-sizing:border-box;border:1px solid var(--line);border-radius:8px;padding:9px 10px;font:inherit;font-size:14.5px;background:var(--bg);color:var(--fg);min-width:0}
+.wk-quick>input{width:100%;font-size:15.5px}
+.wk-row{display:grid;grid-template-columns:2fr 1.2fr 1.3fr auto;gap:6px}
+.wk-row .btn{padding:8px 16px}
+@media (max-width:560px){.wk-row{grid-template-columns:1fr 1fr}.wk-row .btn{grid-column:1/-1}}
+.wk-home{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px 14px 8px}
+.wk-home>header{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0 4px}
+.wk-home>header b{font-size:15.5px}
+.wk-item{display:grid;grid-template-columns:28px 1fr;gap:8px;padding:9px 0;border-top:1px solid var(--line);align-items:start}
+.wk-item:first-of-type{border-top:0}
+.wk-check{width:24px;height:24px;border-radius:50%;border:2px solid var(--muted);background:none;cursor:pointer;padding:0;margin-top:1px;display:grid;place-items:center;color:var(--navy);font-size:13px;font-weight:800}
+.wk-check:hover{border-color:var(--gold)}
+.wk-item.done .wk-check{background:var(--gold);border-color:var(--gold)}
+.wk-item.done .wk-text{text-decoration:line-through;color:var(--muted)}
+.wk-text{font-size:14.5px;line-height:1.45;cursor:pointer;word-break:break-word}
+.wk-item .hk-meta{margin-top:2px}
+.wk-item .lead-form{grid-column:1/-1;margin-top:6px}
+.pill.who{background:color-mix(in srgb,var(--gold) 18%,transparent);color:var(--fg)}
 .sync-chip{font:inherit;font-size:11.5px;border:0;background:none;color:var(--on-navy-muted);padding:0;cursor:default;white-space:nowrap}
 .sync-chip.act{color:var(--gold, #c9a24a);text-decoration:underline;cursor:pointer}
 </style>
@@ -316,7 +347,8 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
       <h1 id="p-name"></h1>
       <p id="p-sub"></p>
       <select class="switch" id="p-switch" aria-label="Choose a home" hidden></select>
-      <nav class="tabs" id="admin-tabs" hidden><a href="#homes" id="tab-homes">Homes</a><a href="#housekeeping" id="tab-hk">Housekeeping</a><a href="#ids" id="tab-ids">IDs</a><a href="#reviews" id="tab-rv">Reviews</a><a href="#info" id="tab-info">Info</a><a href="#owners" id="tab-ow">Owners</a><a href="#service" id="tab-svc">Service</a></nav>
+      <nav class="tabs" id="admin-tabs" hidden><a href="#housekeeping" id="tab-hk">Today</a><a href="#work" id="tab-work">Work</a><a href="#homes" id="tab-homes">Homes</a><button type="button" class="tab-more" id="tab-more" aria-expanded="false" aria-controls="more-menu">More ▾</button></nav>
+      <div class="more-menu" id="more-menu" hidden><a href="#ids" id="tab-ids">🪪 Guest IDs</a><a href="#reviews" id="tab-rv">⭐ Reviews</a><a href="#service" id="tab-svc">❄️ AC &amp; purifier service</a><a href="#owners" id="tab-ow">🏠 Owner outreach</a><a href="#info" id="tab-info">🔑 Codes &amp; Wi-Fi</a></div>
     </div>
     <div class="hero-num" id="hero">
       <div class="label" id="share-label">Your share, all time</div>
@@ -383,15 +415,9 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
       <section>
         <div id="staff-pick-wrap" hidden style="margin-bottom:18px">
           <div class="label" style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)">Show work for</div>
-          <div class="neg-filter" id="staff-pick"></div>
+          <select class="staff-select" id="staff-pick" aria-label="Show work for"></select>
           <div class="hk-meta" id="staff-card" style="margin-top:8px"></div>
         </div>
-        <div class="sec-head"><h2>Tonight</h2><small><button class="small-btn" id="tn-refresh" type="button">Refresh</button></small></div>
-        <div class="tn-sum" id="tn-sum">Checking Airbnb calendars…</div>
-        <div id="tn-list" style="display:grid;gap:8px"></div>
-        <p class="note">Saving a price here records it for the team. Change it on Airbnb or PriceLabs with the "Open in Airbnb" link. Tata Housing is left out because it doesn't allow last-minute bookings.</p>
-      </section>
-      <section>
         <div class="hk-sum" id="hk-sum"></div>
       </section>
       <section>
@@ -405,9 +431,40 @@ details.tn-more summary{cursor:pointer;font-size:13px;color:var(--muted);padding
         <div id="ms-list" style="display:grid;gap:8px;margin-top:10px"></div>
       </section>
       <section>
-        <div class="sec-head"><h2 id="hk-staff-h">Staff and payments</h2><small id="hk-month"></small></div>
-        <div class="staff" id="hk-staff"></div>
-        <p class="note">Payments are expenses with words like salary, maid, housekeeping or cleaning in the details. Add names, phones and monthly pay in the Staff tab of the sheet.</p>
+        <details class="fold" id="tn-fold">
+          <summary><span>Empty tonight · set prices</span><span class="tn-sum" id="tn-sum">Checking Airbnb calendars…</span></summary>
+          <div style="display:flex;justify-content:flex-end;margin:6px 0"><button class="small-btn" id="tn-refresh" type="button">Refresh</button></div>
+          <div id="tn-list" style="display:grid;gap:8px"></div>
+          <p class="note" style="margin-top:8px">Saving a price here records it for the team. Change it on Airbnb or PriceLabs with the "Open in Airbnb" link. Tata Housing is left out because it doesn't allow last-minute bookings.</p>
+        </details>
+      </section>
+      <section>
+        <details class="fold">
+          <summary><span id="hk-staff-h">Staff and payments</span><small id="hk-month"></small></summary>
+          <div class="staff" id="hk-staff" style="margin-top:10px"></div>
+          <p class="note" style="margin-top:8px">Payments are expenses with words like salary, maid, housekeeping or cleaning in the details. Add names, phones and monthly pay in the Staff tab of the sheet.</p>
+        </details>
+      </section>
+    </div>
+
+    <!-- Pending work per home (team only) -->
+    <div class="wrap" id="view-work" hidden>
+      <section>
+        <form class="wk-quick" id="wk-quick" autocomplete="off">
+          <input name="task" id="wk-task" placeholder="What needs doing?" required maxlength="500" aria-label="What needs doing">
+          <div class="wk-row">
+            <input name="home" list="wk-homes" placeholder="Home" required aria-label="Home">
+            <select name="who" aria-label="For"></select>
+            <input name="due" type="date" aria-label="Due date (optional)" title="Due date (optional)">
+            <button class="btn gold" type="submit">Add</button>
+          </div>
+          <span class="hk-meta" id="wk-msg"></span>
+        </form>
+        <datalist id="wk-homes"></datalist>
+        <div class="neg-filter" id="wk-filter"></div>
+        <input class="info-search" id="wk-q" type="search" placeholder="Search a home or task…" aria-label="Search pending work" style="margin-top:10px">
+        <div id="wk-list" style="display:grid;gap:12px;margin-top:12px"></div>
+        <p class="note" style="margin-top:12px">Rohit, Deepika and Sunil ji can all add, edit and tick off items. Saved to the "Pending Work" tab of the sheet; done items stay as each home's history.</p>
       </section>
     </div>
 
@@ -617,7 +674,7 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
     $("admin-tabs").hidden = !DATA.housekeeping;
     $("tab-homes").hidden = !DATA.properties.length;
     if (DATA.admin && DATA.housekeeping && !location.hash) history.replaceState(null, "", location.pathname + location.search + "#housekeeping");
-    if (!DATA.properties.length) { if (!/^#(housekeeping|reviews|info|owners|service|ids)$/.test(location.hash)) history.replaceState(null, "", location.pathname + location.search + "#housekeeping"); return; }
+    if (!DATA.properties.length) { if (!/^#(housekeeping|work|reviews|info|owners|service|ids)$/.test(location.hash)) history.replaceState(null, "", location.pathname + location.search + "#housekeeping"); return; }
     pick(0);
   }
 
@@ -649,14 +706,13 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
     const T = teamList(), wrap = $("staff-pick-wrap");
     wrap.hidden = !T.length; if (!T.length) return;
     if (staffSel !== "all" && !selPerson()) staffSel = "all";
-    $("staff-pick").innerHTML = [["all", "Everyone"]].concat(T.map(p => [p.name, p.name])).map(([k, l]) => `<button type="button" data-staff="${esc(k)}" class="${k === staffSel ? "on" : ""}">${esc(l)}</button>`).join("");
+    $("staff-pick").innerHTML = [["all", "Everyone"]].concat(T.map(p => [p.name, p.name])).map(([k, l]) => `<option value="${esc(k)}"${k === staffSel ? " selected" : ""}>${esc(l)}</option>`).join("");
     const p = selPerson();
     const tel = p && p.phone ? p.phone.replace(/[^0-9+]/g, "") : "";
     $("staff-card").innerHTML = p ? `${esc(p.role || "Staff")} · covers ${p.covers.map(esc).join(", ")}${tel ? ` · <a href="tel:${esc(tel)}">${esc(p.phone)}</a> · <a href="https://wa.me/${esc(tel.replace(/^\+/, ""))}" target="_blank" rel="noopener">WhatsApp</a>` : ""}` : "";
   }
-  $("staff-pick").addEventListener("click", e => {
-    const b = e.target.closest("[data-staff]"); if (!b) return;
-    staffSel = b.dataset.staff; try { localStorage.setItem("sc_staff", staffSel); } catch(err){}
+  $("staff-pick").addEventListener("change", e => {
+    staffSel = e.target.value; try { localStorage.setItem("sc_staff", staffSel); } catch(err){}
     renderHK(); if (TN) renderTonight();
   });
 
@@ -882,6 +938,115 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
     });
   }
   $("svc-filter").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if (b) { svcFilter = b.dataset.f; renderService(); } });
+
+  // ---------- Pending work per home ----------
+  let wkFilter = "open", wkQ = "";
+  try { wkFilter = localStorage.getItem("sc_wk_filter") || "open"; } catch(e){}
+  const WK_ME = () => { const e = String(DATA.email || "").toLowerCase(); return e.startsWith("aggrohit") ? "Rohit" : e.startsWith("deepika") ? "Deepika" : e.startsWith("sunil") ? "Sunil" : ""; };
+  const wkToday = () => (DATA.housekeeping && DATA.housekeeping.today) || new Date().toISOString().slice(0, 10);
+  const wkPeople = () => (DATA.tasks && DATA.tasks.people) || ["Rohit", "Deepika", "Sunil"];
+  async function wkSave(params){
+    const q = new URLSearchParams(Object.assign({action: "task", token: store.get() || memToken}, params));
+    const j = await fetch(API + "?" + q).then(r => r.json()); if (!j.ok) throw new Error(j.error || "Couldn't save. Try again.");
+    const T = DATA.tasks;
+    if (j.deleted) T.items = T.items.filter(x => x.id !== params.id);
+    else { const i = T.items.findIndex(x => x.id === j.item.id); if (i > -1) T.items[i] = j.item; else T.items.unshift(j.item); }
+    try { dataCache.set(store.get() || memToken, DATA); } catch(e){}
+    return j;
+  }
+  function wkWhoOptions(sel){ return [["", "Anyone"]].concat(wkPeople().map(n => [n, n === "Sunil" ? "Sunil ji" : n])).map(([v, l]) => `<option value="${esc(v)}"${v === (sel || "") ? " selected" : ""}>${esc(l)}</option>`).join(""); }
+  function wkEditForm(x, done){
+    const f = document.createElement("form"); f.className = "lead-form";
+    f.innerHTML = `<label>Task<textarea name="task" required maxlength="500">${esc(x.task)}</textarea></label>
+      <div class="two"><label>Home<input name="home" list="wk-homes" required value="${esc(x.home)}" autocomplete="off"></label><label>For<select name="who">${wkWhoOptions(x.who)}</select></label></div>
+      <div class="two"><label>Status<select name="status">${DATA.tasks.statuses.map(st => `<option${st === x.status ? " selected" : ""}>${esc(st)}</option>`).join("")}</select></label><label>Due<input name="due" type="date" value="${esc(x.due || "")}"></label></div>
+      <label>Notes<textarea name="notes" placeholder="Vendor, cost, photos sent on WhatsApp…">${esc(x.notes || "")}</textarea></label>
+      <div class="neg-form"><button class="btn gold" type="submit">Save</button><button class="small-btn" type="button" data-cancel>Cancel</button><button class="small-btn" type="button" data-del>Delete</button><span class="hk-meta" data-msg></span></div>`;
+    f.addEventListener("submit", async ev => {
+      ev.preventDefault(); const b = f.querySelector("[type=submit]"), msg = f.querySelector("[data-msg]"); b.disabled = true; msg.textContent = "Saving…";
+      try { await wkSave({id: x.id, task: f.task.value, home: f.home.value, who: f.who.value, status: f.status.value, due: f.due.value, notes: f.notes.value}); done(); }
+      catch(err) { b.disabled = false; msg.textContent = err.message; }
+    });
+    f.querySelector("[data-cancel]").addEventListener("click", () => done());
+    const d = f.querySelector("[data-del]");
+    d.addEventListener("click", async () => {
+      if (d.dataset.sure !== "1") { d.dataset.sure = "1"; d.textContent = "Tap again to delete"; return; }
+      d.disabled = true;
+      try { await wkSave({id: x.id, del: "1"}); done(); } catch(err) { d.disabled = false; d.textContent = "Try again"; }
+    });
+    return f;
+  }
+  function wkItem(x){
+    const t = wkToday(), el = document.createElement("div"), isDone = x.status === "Done";
+    const late = !isDone && x.due && x.due < t;
+    el.className = "wk-item" + (isDone ? " done" : "");
+    const bits = [];
+    if (x.who) bits.push(`<span class="pill who">${esc(x.who === "Sunil" ? "Sunil ji" : x.who)}</span>`);
+    if (x.status === "In progress") bits.push(`<span class="pill warn">In progress</span>`);
+    if (!isDone && x.due) bits.push(`<span class="pill ${late ? "late" : x.due === t ? "warn" : "muted"}">${late ? "Overdue · " : "Due "}${esc(dayName(x.due, t))}</span>`);
+    bits.push(isDone ? `Done ${esc(x.doneOn ? dayName(x.doneOn, t) : "")}${x.updatedBy ? " by " + esc(x.updatedBy) : ""}` : `Added ${esc(x.added ? dayName(x.added, t) : "")}${x.addedBy ? " by " + esc(x.addedBy) : ""}`);
+    el.innerHTML = `<button type="button" class="wk-check" aria-label="${isDone ? "Mark as not done" : "Mark as done"}" title="${isDone ? "Reopen" : "Done"}">${isDone ? "✓" : ""}</button>
+      <div><div class="wk-text" role="button" tabindex="0" title="Tap to edit">${esc(x.task)}</div>
+        ${x.notes ? `<p class="lead-notes" style="font-size:13px;color:var(--muted);margin-top:2px">${esc(x.notes)}</p>` : ""}
+        <div class="hk-meta">${bits.join("")}</div></div>`;
+    const chk = el.querySelector(".wk-check");
+    chk.addEventListener("click", async () => {
+      chk.disabled = true; el.classList.toggle("done", !isDone); chk.textContent = isDone ? "" : "✓";
+      try { await wkSave({id: x.id, done: isDone ? "0" : "1"}); setTimeout(renderWork, isDone ? 0 : 450); }
+      catch(err) { chk.disabled = false; el.classList.toggle("done", isDone); chk.textContent = isDone ? "✓" : ""; alert(err.message); }
+    });
+    const edit = () => { if (el.querySelector("form")) return; el.appendChild(wkEditForm(x, renderWork)); };
+    const txt = el.querySelector(".wk-text");
+    txt.addEventListener("click", edit); txt.addEventListener("keydown", e => { if (e.key === "Enter") edit(); });
+    return el;
+  }
+  function renderWork(){
+    const T = DATA.tasks; if (!T) return;
+    const t = wkToday(), me = WK_ME();
+    $("p-name").textContent = "Pending work"; $("p-sub").textContent = "Jobs for each home, shared by Rohit, Deepika and Sunil ji";
+    const homes = [...new Set((T.homes || []).concat(DATA.service ? DATA.service.homes || [] : []).concat(T.items.map(x => x.home)))].filter(Boolean).sort();
+    $("wk-homes").innerHTML = homes.map(h => `<option value="${esc(h)}">`).join("");
+    const qf = $("wk-quick"); if (!qf.who.options.length) qf.who.innerHTML = wkWhoOptions("");
+    const open = T.items.filter(x => x.status !== "Done");
+    const mineN = open.filter(x => x.who === me).length, lateN = open.filter(x => x.due && x.due < t).length;
+    $("wk-filter").innerHTML = [["open", `Open · ${open.length}`]].concat(me ? [["mine", `For me · ${mineN}`]] : []).concat([["late", `Overdue · ${lateN}`], ["done", "Done"]])
+      .map(([k, l]) => `<button type="button" data-f="${k}" class="${k === wkFilter ? "on" : ""}">${l}</button>`).join("");
+    const q = wkQ.trim().toLowerCase();
+    let shown = T.items.filter(x => wkFilter === "done" ? x.status === "Done" : x.status !== "Done");
+    if (wkFilter === "mine") shown = shown.filter(x => x.who === me);
+    if (wkFilter === "late") shown = shown.filter(x => x.due && x.due < t);
+    if (q) shown = shown.filter(x => (x.home + " " + x.task + " " + (x.notes || "") + " " + (x.who || "")).toLowerCase().includes(q));
+    const list = $("wk-list"); list.innerHTML = "";
+    if (!shown.length) {
+      list.innerHTML = `<p class="note">${!T.items.length ? "Nothing yet. Type the first job above, pick the home and tap Add." : wkFilter === "done" ? "Nothing ticked off yet." : q ? "No match." : "All clear. Nothing pending here. 🎉"}</p>`; return;
+    }
+    const by = {}; shown.forEach(x => (by[x.home] = by[x.home] || []).push(x));
+    const rank = x => x.status === "Done" ? 9 : (x.due && x.due < t ? 0 : x.status === "In progress" ? 1 : x.due ? 2 : 3);
+    const homeOrder = Object.keys(by).sort((a, b) => wkFilter === "done"
+      ? (by[b][0].doneOn || "").localeCompare(by[a][0].doneOn || "")
+      : Math.min(...by[a].map(rank)) - Math.min(...by[b].map(rank)) || by[b].length - by[a].length || a.localeCompare(b));
+    homeOrder.forEach(h => {
+      const box = document.createElement("div"); box.className = "wk-home";
+      const items = by[h].sort((a, b) => wkFilter === "done" ? (b.doneOn || "").localeCompare(a.doneOn || "") : rank(a) - rank(b) || (a.due || "9").localeCompare(b.due || "9") || (a.added || "").localeCompare(b.added || ""));
+      box.innerHTML = `<header><b>${esc(h)}</b><span class="hk-meta">${wkFilter === "done" ? items.length + " done" : items.length + " open"} · <button class="small-btn" type="button" data-add>+ Add</button></span></header>`;
+      box.querySelector("[data-add]").addEventListener("click", () => { qf.home.value = h; $("wk-task").focus(); window.scrollTo({top: 0, behavior: "smooth"}); });
+      items.forEach(x => box.appendChild(wkItem(x)));
+      list.appendChild(box);
+    });
+  }
+  $("wk-filter").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if (!b) return; wkFilter = b.dataset.f; try { localStorage.setItem("sc_wk_filter", wkFilter); } catch(err){} renderWork(); });
+  $("wk-q").addEventListener("input", e => { wkQ = e.target.value; renderWork(); });
+  $("wk-quick").addEventListener("submit", async e => {
+    e.preventDefault(); const f = e.target, b = f.querySelector("[type=submit]"), msg = $("wk-msg");
+    b.disabled = true; msg.textContent = "Adding…";
+    try {
+      await wkSave({task: f.task.value, home: f.home.value, who: f.who.value, due: f.due.value});
+      f.task.value = ""; f.due.value = ""; msg.textContent = "Added ✓"; setTimeout(() => { if (msg.textContent === "Added ✓") msg.textContent = ""; }, 2000);
+      if (wkFilter === "done") wkFilter = "open";
+      renderWork(); $("wk-task").focus();
+    } catch(err) { msg.textContent = err.message; }
+    b.disabled = false;
+  });
 
   // ---------- Owner outreach ----------
   let owFilter = "active";
@@ -1355,20 +1520,27 @@ const API = "https://script.google.com/macros/s/AKfycbwVcuujasz_DGa2xnGNFTzzaJQE
   function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 
   // ---------- Views ----------
+  $("tab-more").addEventListener("click", () => { const m = $("more-menu"); m.hidden = !m.hidden; $("tab-more").setAttribute("aria-expanded", String(!m.hidden)); });
+  document.addEventListener("click", e => { if (!e.target.closest("#more-menu, #tab-more")) { $("more-menu").hidden = true; $("tab-more").setAttribute("aria-expanded", "false"); } });
   function route(){
     if (!DATA) return;
     const opsOnly = !DATA.properties.length;
-    const hk = !!DATA.housekeeping && (location.hash === "#housekeeping" || (opsOnly && !/^#(reviews|info|owners|service|ids)$/.test(location.hash)));
-    const rv = !hk && location.hash === "#reviews" && !!DATA.reviews;
+    const wk = location.hash === "#work" && !!DATA.tasks;
+    const hk = !wk && !!DATA.housekeeping && (location.hash === "#housekeeping" || (opsOnly && !/^#(reviews|info|owners|service|ids)$/.test(location.hash) && !wk));
+    const rv = !hk && !wk && location.hash === "#reviews" && !!DATA.reviews;
     const info = !hk && !rv && location.hash === "#info" && !!DATA.housekeeping;
     const ow = !hk && !rv && !info && location.hash === "#owners" && !!DATA.leads;
     const svc = !hk && !rv && !info && !ow && location.hash === "#service" && !!DATA.service;
     const ids = !hk && !rv && !info && !ow && !svc && location.hash === "#ids" && !!DATA.housekeeping;
-    const ops = hk || rv || info || ow || svc || ids;
+    const ops = hk || rv || info || ow || svc || ids || wk;
     const rep = !ops && location.hash === "#report";
-    $("view-home").hidden = rep || ops; $("view-report").hidden = !rep; $("view-hk").hidden = !hk; $("view-rv").hidden = !rv; $("view-info").hidden = !info; $("view-ow").hidden = !ow; $("view-svc").hidden = !svc; $("view-ids").hidden = !ids;
+    $("view-home").hidden = rep || ops; $("view-report").hidden = !rep; $("view-hk").hidden = !hk; $("view-rv").hidden = !rv; $("view-info").hidden = !info; $("view-ow").hidden = !ow; $("view-svc").hidden = !svc; $("view-ids").hidden = !ids; $("view-work").hidden = !wk;
     $("hero").hidden = ops; $("kpis").hidden = ops; $("p-switch").hidden = ops || DATA.properties.length < 2;
     $("tab-homes").classList.toggle("on", !ops); $("tab-hk").classList.toggle("on", !!hk); $("tab-rv").classList.toggle("on", !!rv); $("tab-info").classList.toggle("on", !!info); $("tab-ow").classList.toggle("on", !!ow); $("tab-ow").hidden = !DATA.leads; $("tab-svc").classList.toggle("on", !!svc); $("tab-svc").hidden = !DATA.service; $("tab-ids").classList.toggle("on", !!ids); $("tab-ids").hidden = !DATA.housekeeping;
+    $("tab-work").classList.toggle("on", !!wk); $("tab-work").hidden = !DATA.tasks;
+    const moreOn = rv || info || ow || svc || ids, moreName = rv ? "Reviews" : info ? "Codes" : ow ? "Owners" : svc ? "Service" : ids ? "IDs" : "More";
+    $("tab-more").classList.toggle("on", !!moreOn); $("tab-more").textContent = moreName + " ▾"; $("more-menu").hidden = true; $("tab-more").setAttribute("aria-expanded", "false");
+    if (wk) renderWork();
     if (hk) { renderHK(); loadTonight(false); }
     if (rv) renderReviews();
     if (ow) renderOwners();
